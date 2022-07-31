@@ -12,11 +12,15 @@ app.get('/', async (req, res) => {
     res.sendFile(`${__dirname}/client/index.html`);
 });
 
-app.post('/', async (req, res) => {
-    if (!req.body.command) {
-        res.status(400).send({ message: 'Command not sent' });
+app.get('/:room/workers', async (req, res) => {
+    const room = wss.roomList[ req.params.room ];
+
+    if (!room) {
+        res.status(404).send({ status: 404, message: 'Room not found' });
         return;
     }
+
+    res.send({ status: 200, result: Object.keys(room) });
 });
 
 wss.onClient = (action, socket) => {
