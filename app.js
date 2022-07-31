@@ -1,5 +1,8 @@
 const express = require('express');
-const wss = require('./wsserver.js');
+const wss = require('./wsserver');
+const db = require('./database');
+
+db.connect();
 
 const app = express();
 const port = 4200;
@@ -12,7 +15,7 @@ app.get('/', async (req, res) => {
     res.sendFile(`${__dirname}/client/index.html`);
 });
 
-app.get('/:room/workers', async (req, res) => {
+app.get('/rooms/:room', async (req, res) => {
     const room = wss.roomList[ req.params.room ];
 
     if (!room) {

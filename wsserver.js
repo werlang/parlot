@@ -19,10 +19,6 @@ wss.on('connection', function(socket) {
         },
     }));
 
-    if (this.onClient) {
-        this.onClient('connect', socket);
-    }
-
     socket.on('message', message => {
         message = JSON.parse(message);
         // console.log(message);
@@ -81,10 +77,6 @@ wss.on('connection', function(socket) {
             delete room[ socket.id ];
         });
 
-        if (this.onClient) {
-            this.onClient('disconnect', socket);
-        }    
-
         socket.send(JSON.stringify({
             room: 'self',
             sender: 'server',
@@ -93,6 +85,10 @@ wss.on('connection', function(socket) {
                 message: 'Disconnected from WebSocket server',
             }
         }));
+
+        if (this.onClient) {
+            this.onClient('disconnect', socket);
+        }    
     });
 
     socket.join = room => {
@@ -109,6 +105,10 @@ wss.on('connection', function(socket) {
         if (!Object.keys(this.roomList[ room ]).length) {
             delete this.roomList[ room ];
         }
+    }
+
+    if (this.onClient) {
+        this.onClient('connect', socket);
     }
 });
 

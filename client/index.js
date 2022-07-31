@@ -43,7 +43,7 @@ const rooms = {
     list: {},
 
     add: async function(name) {
-        const res = await fetch(`/${name}/workers`);
+        const res = await fetch(`/rooms/${name}`);
         const data = await res.json();
         if (data.status == 200) {
             this.list[name] = data.result;
