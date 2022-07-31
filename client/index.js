@@ -1,7 +1,5 @@
 import { socket } from './wsclient.js'
 
-socket.connect();
-
 const terminal = document.querySelector('#terminal');
 const input = document.querySelector('input');
 input.focus();
@@ -10,24 +8,65 @@ document.body.addEventListener('click', () => input.focus());
 
 input.addEventListener('keypress', e => {
     if (e.key == 'Enter') {
-        send(input.value);
-        insert('$> ' + input.value);
+        if (input.value.length) {
+            socket.emit('worker', {
+                action: 'execute',
+                command: input.value,
+            });
+        }
+    
+        insertTerminal('$> ' + input.value);
         input.value = '';
     }
 });
 
+socket.connect().then(() => {
+    socket.join('admin', (data, sender) => {
+        if (data.action == 'command') {
+            insertTerminal(data.response);
+            return;
+        }
+        if (data.action == 'client update') {
+            rooms.add('worker');
 const send = command => {
     socket.emit('worker', {
         action: 'execute',
         command: command,
     });
+});
 
-    socket.on('self', (data, sender) => {
-        insert(data.response);
-    });
-}
-
-const insert = text => {
+const insertTerminal = text => {
     terminal.insertAdjacentHTML('beforeend', `<pre>${ text }</pre>`);
     terminal.scrollTo({ top: terminal.scrollHeight });
 }
+
+const rooms = {
+    list: {},
+
+    add: async function(name) {
+        const res = await fetch(`/${name}/workers`);
+        const data = await res.json();
+        if (data.status == 200) {
+            this.list[name] = data.result;
+        }
+        this.render();
+    },
+
+    render: function() {
+        let text = Object.entries(this.list).map(([room, workers]) => {
+            const workerText = workers.map(w => {
+                return `<div class="worker" id="worker-${w}">
+                    <div class="name">${w}</div>
+                </div>`;
+            }).join('');
+            
+            return `<div class="room" id="room-${room}">
+                <div class="name">${room}</div>
+                ${ workerText }
+            </div>`;
+        }).join('');
+        document.querySelector(`#room-container`).innerHTML = text;
+    },
+}
+
+rooms.add('worker');
