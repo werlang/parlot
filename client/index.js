@@ -1,3 +1,4 @@
+import { Toast } from './utils.js';
 import { socket } from './wsclient.js'
 
 const terminal = document.querySelector('#terminal');
@@ -28,10 +29,8 @@ socket.connect().then(() => {
         }
         if (data.action == 'client update') {
             rooms.add('worker');
-const send = command => {
-    socket.emit('worker', {
-        action: 'execute',
-        command: command,
+            new Toast(`Client ${ data.id } ${ data.type }ed`, { timeOut: 3000 } );
+        }
     });
 });
 

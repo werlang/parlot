@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+@import "common";
+@import "utils";
+
+#menu {
+    width: 200px;  
+    background-color: var(--main-color);
+    flex-shrink: 0;  
+    
+    #logo {
+        background-color: var(--main-light-color);  
+        color: white;
+        font-size: 1.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 35px;
+    }
+
+    #room-container {
+        color: var(--text-color);
+
+        .room {
+            .name {
+                padding: 10px 10px 5px;
+                display: flex;
+                align-items: center;
+                font-weight: bold;
+            }
+
+            .worker {
+                
+                .name {
+                    border-left: 2px solid var(--main-dark-color);
+                    margin-left: 15px;
+                    padding: 5px 10px;
+                    font-weight: normal;
+                    max-width: 100%;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: block;
+                }
+            }
+        }
+    }
+}
+
+#frame {
+    flex-grow: 1;
+    height: 100vh;
+    overflow: hidden;
+
+    #terminal {
+        padding: 5px 10px 0;
+        background-color: var(--terminal-bg-color);
+        color: var(--terminal-text-color);
+        width: 100%;
+        box-sizing: border-box;
+        overflow-y: auto;
+        max-height: calc(100vh - 30px);
+        font-family: monospace;
+        
+        pre {
+            margin: 5px 0;
+            overflow-x: hidden;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+    }
+    
+    
+    #input-container {
+        width: 100%;
+        background-color: var(--terminal-bg-color);
+        color: var(--terminal-text-color);
+        display: flex;
+        align-items: center;
+        padding: 0px 10px;
+        box-sizing: border-box;
+        font-family: monospace;
+        height: 30px;
+        
+        input {
+            flex-grow: 1;
+            outline: none;
+            background-color: var(--terminal-bg-color);
+            color: var(--terminal-text-color);
+            padding: 5px;
+            font-size: 1rem;
+            border: none;
+            font-family: monospace;
+        }
+    }
+}
