@@ -5,56 +5,62 @@ export const socket = {
     actionList: {},
 }
 
-socket.connect = function () {
-    if (this.connected) return;
-    
-    this.ws = new WebSocket(`ws://${ this.serverURL }:${ this.port }`);
-
-    this.ws.onopen = () => {
-        console.log('connected to websocket server');
-        this.connected = true;
-    }
-
-    this.ws.onclose = () => {
+socket.connect = async function () {
+    return new Promise(resolve => {
         if (this.connected) {
-            console.log('websocket disconnected');
-        }
-        else {
-            console.log('reconnecting to websocket server...');
-        }
-        this.connected = false;
-        setTimeout(() => this.connect(), 1000);
-    }
-
-    // run callback event for receiving message for a room
-    this.ws.onmessage = async event => {
-        const msg = JSON.parse(event.data);
-
-        // if connection first stabilished
-        if (msg.room == 'self' && msg.sender == 'server' && msg.data.action == 'connect'){
-            this.id = msg.data.id;
+            resolve(this);
             return;
         }
-
-        // the callback for receiving a message have 2 args: sender and data.
-        let reply = {
-            success: true,
-            message: 'received, but the recipient sent no reply',
-        };
-
-        if (this.actionList[msg.room]) {
-            reply = await this.actionList[msg.room](msg.data, msg.sender);
-            // console.log(reply);
+        
+        this.ws = new WebSocket(`ws://${ this.serverURL }:${ this.port }`);
+    
+        this.ws.onopen = () => {
+            console.log('connected to websocket server');
+            this.connected = true;
+            resolve(this);
         }
-        // timestamp means that need to send a reply
-        if (msg.timestamp) {
-            this.ws.send(JSON.stringify({
-                replyTo: msg.sender,
-                data: reply,
-                timestamp: msg.timestamp,
-            }));
+    
+        this.ws.onclose = () => {
+            if (this.connected) {
+                console.log('websocket disconnected');
+            }
+            else {
+                console.log('reconnecting to websocket server...');
+            }
+            this.connected = false;
+            setTimeout(() => this.connect(), 1000);
         }
-    }
+    
+        // run callback event for receiving message for a room
+        this.ws.onmessage = async event => {
+            const msg = JSON.parse(event.data);
+    
+            // if connection first stabilished
+            if (msg.room == 'self' && msg.sender == 'server' && msg.data.action == 'connect'){
+                this.id = msg.data.id;
+                return;
+            }
+    
+            // the callback for receiving a message have 2 args: sender and data.
+            let reply = {
+                success: true,
+                message: 'received, but the recipient sent no reply',
+            };
+    
+            if (this.actionList[msg.room]) {
+                reply = await this.actionList[msg.room](msg.data, msg.sender);
+                // console.log(reply);
+            }
+            // timestamp means that need to send a reply
+            if (msg.timestamp) {
+                this.ws.send(JSON.stringify({
+                    replyTo: msg.sender,
+                    data: reply,
+                    timestamp: msg.timestamp,
+                }));
+            }
+        }
+    });
 }
 
 // join or leave a room
