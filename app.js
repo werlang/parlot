@@ -1,11 +1,15 @@
 const express = require('express');
-const wss = require('./wsserver');
-const db = require('./database');
-
-db.connect();
-
 const app = express();
 const port = 4200;
+
+const wss = require('./wsserver');
+wss.onClient = (action, socket) => {
+    wss.emit('admin', {
+        action: 'client update',
+        type: action,
+        id: socket.id,
+    })
+}
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -15,8 +19,10 @@ app.get('/', async (req, res) => {
     res.sendFile(`${__dirname}/client/index.html`);
 });
 
+// in the future
+// require('./api')(app, wss);
 app.get('/rooms/:room', async (req, res) => {
-    const room = wss.roomList[ req.params.room ];
+    let room = wss.roomList[ req.params.room ];
 
     if (!room) {
         res.status(404).send({ status: 404, message: 'Room not found' });
@@ -26,13 +32,6 @@ app.get('/rooms/:room', async (req, res) => {
     res.send({ status: 200, result: Object.keys(room) });
 });
 
-wss.onClient = (action, socket) => {
-    wss.emit('admin', {
-        action: 'client update',
-        type: action,
-        id: socket.id,
-    })
-}
 
 app.use((_, res) => res.status(404).send({ message: 'Nothing to be seen here.' }));
 
