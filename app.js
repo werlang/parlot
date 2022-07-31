@@ -1,5 +1,5 @@
 const express = require('express');
-require('./wsserver.js');
+const wss = require('./wsserver.js');
 
 const app = express();
 const port = 4200;
@@ -18,6 +18,14 @@ app.post('/', async (req, res) => {
         return;
     }
 });
+
+wss.onClient = (action, socket) => {
+    wss.emit('admin', {
+        action: 'client update',
+        type: action,
+        id: socket.id,
+    })
+}
 
 app.use((_, res) => res.status(404).send({ message: 'Nothing to be seen here.' }));
 

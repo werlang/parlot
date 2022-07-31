@@ -19,6 +19,10 @@ wss.on('connection', function(socket) {
         },
     }));
 
+    if (this.onClient) {
+        this.onClient('connect', socket);
+    }
+
     socket.on('message', message => {
         message = JSON.parse(message);
         // console.log(message);
@@ -73,7 +77,13 @@ wss.on('connection', function(socket) {
 
     // remove client from list
     socket.on('close', () => {
-        delete this.roomList.everyone[ socket.id ];
+        Object.values(this.roomList).forEach(room => {
+            delete room[ socket.id ];
+        });
+
+        if (this.onClient) {
+            this.onClient('disconnect', socket);
+        }    
 
         socket.send(JSON.stringify({
             room: 'self',

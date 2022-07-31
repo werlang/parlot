@@ -9,7 +9,10 @@ const socket = {
 socket.connect = async function () {
     this.running = true;
     return new Promise(resolve => {
-        if (this.connected) return this;
+        if (this.connected){
+            resolve(this);
+            return;
+        } 
         
         this.ws = new WebSocket(`ws://${ this.serverURL }:${ this.port }`);
         
