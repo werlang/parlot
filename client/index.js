@@ -1,30 +1,12 @@
 import { Modal, Toast } from './utils.js';
 import { socket } from './wsclient.js'
 
-// const terminal = document.querySelector('#terminal');
-// const input = document.querySelector('input');
-// input.focus();
-
-// document.querySelector('#frame').addEventListener('click', () => input.focus());
-
-// input.addEventListener('keypress', e => {
-//     if (e.key == 'Enter') {
-//         if (input.value.length) {
-//             socket.emit('worker', {
-//                 action: 'execute',
-//                 command: input.value,
-//             });
-//         }
-    
-//         insertTerminal('$> ' + input.value);
-//         input.value = '';
-//     }
-// });
-
 socket.connect().then(() => {
     socket.join('admin', (data, sender) => {
+        // console.log(data)
         if (data.action == 'command') {
-            insertTerminal(data.response);
+            const worker = rooms.getWorker(sender);
+            rooms.updateTerminal(worker, data.response);
             return;
         }
         if (data.action == 'client update') {
@@ -36,11 +18,6 @@ socket.connect().then(() => {
         }
     });
 });
-
-const insertTerminal = text => {
-    terminal.insertAdjacentHTML('beforeend', `<pre>${ text }</pre>`);
-    terminal.scrollTo({ top: terminal.scrollHeight });
-}
 
 const rooms = {
     list: {},
@@ -54,16 +31,32 @@ const rooms = {
         const res = await fetch(`/rooms/${name}`);
         const data = await res.json();
         if (data.status == 200) {
-            this.list[name] = data.result;
+            // insert new workers
+            if (!this.list[name]) {
+                this.list[name] = [];
+            }
+
+            data.result.forEach(worker => {
+                if (!this.list[name].find(e => e.id == worker.id)) {
+                    this.list[name].push(worker);
+                }
+            })
+            
+            // remove workers that left
+            this.list[name].forEach(worker => {
+                if (!data.result.find(e => e.id == worker.id)) {
+                    this.list[name] = this.list[name].filter(e => e.id != worker.id);
+                }
+            })
         }
         else {
             delete this.list[name];
             new Toast(`👎 Room <span class="bold">${name}</span> not found`, { timeOut: 3000 });
         }
-        this.render();    
+        this.renderDOM();
     },
 
-    render: function() {
+    renderDOM: function() {
         let text = Object.entries(this.list).map(([room, workers]) => {
             const workerText = workers.map(w => {
                 return `<div class="worker" id="worker-${ w.id }">
@@ -78,29 +71,84 @@ const rooms = {
         }).join('');
         document.querySelector(`#room-container`).innerHTML = text;
 
-        const terminals = Object.entries(this.list).map(([room, workers]) => {
-            return workers.map(w => {
-                return this.createTerminal(`${ room } - ${ w.name || w.id }`);
-            }).join('');
-        }).join('');
+        const roomContainers = Object.entries(this.list).map(([room, workers]) => {
+            const roomTerminals = workers.map(w => {
+                return this.createTerminal(room, w);
+            });
+            const container = document.createElement('div');
+            container.classList.add('room-terminal-container');
+            roomTerminals.forEach(e => container.insertAdjacentElement('beforeend', e));
+            return container;
+        });
 
-        document.querySelector(`#frame`).innerHTML = terminals;
+        const frame = document.querySelector(`#frame`);
+        frame.innerHTML = '';
+        roomContainers.forEach(e => frame.insertAdjacentElement('beforeend', e));
     },
 
-    createTerminal: function(title) {
-        return `<div class="window">
+    createTerminal: function(room, worker) {
+        console.log(worker)
+        let lines = [];
+        if (worker.terminal && worker.terminal.lines) {
+            lines = worker.terminal.lines;
+        }
+
+        worker.terminal = { dom: document.createElement('div'), lines: lines };
+        worker.terminal.dom.classList.add('window');
+        worker.terminal.dom.innerHTML = `
             <div id="title">
                 <div class="button" id="close"></div>
                 <div class="button" id="minimize"></div>
                 <div class="button" id="maximize"></div>
-                <div id="text">${ title }</div>
+                <div id="text">${ room } - ${ worker.name || worker.id }</div>
             </div>
             <div class="terminal"></div>
             <div id="input-container">
                 <span>$></span>
                 <input>
             </div>
-        </div>`;
+        `;
+
+        const input = worker.terminal.dom.querySelector('input');
+
+        worker.terminal.dom.addEventListener('click', () => input.focus());
+
+        input.addEventListener('keypress', e => {
+            if (e.key == 'Enter') {
+                if (input.value.length) {
+                    socket.emit(worker.id, {
+                        action: 'execute',
+                        command: input.value,
+                    });
+
+                    this.updateTerminal(worker, `$> ${ input.value }`);
+                }
+                input.value = '';
+            }
+        });
+
+        worker.terminal.lines.forEach(l => this.updateTerminal(worker, l, false));
+
+        return worker.terminal.dom;
+    },
+
+    updateTerminal: function(worker, text, insert=true) {
+        const terminal = worker.terminal.dom.querySelector('.terminal');
+        terminal.insertAdjacentHTML('beforeend', `<pre>${ text }</pre>`);
+        terminal.scrollTo({ top: terminal.scrollHeight });
+
+        if (!worker.terminal.lines) {
+            worker.terminal.lines = [];
+        }
+
+        if (insert) {
+            worker.terminal.lines.push(text);
+        }
+    },
+
+    getWorker: function(id) {
+        const merged = Object.values(this.list).reduce((p,c) => [...p, ...c], []);
+        return merged.find(e => e.id == id);
     },
 }
 

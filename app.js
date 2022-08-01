@@ -5,7 +5,7 @@ const port = 4200;
 
 const wss = require('./wsserver');
 wss.onClient = (socket, data) => {
-    if (['join', 'leave'].includes(data.action)) {
+    if (['join', 'leave'].includes(data.action) && data.room != 'self') {
         wss.emit('admin', {
             action: 'client update',
             type: data.action,
