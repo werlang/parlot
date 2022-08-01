@@ -132,12 +132,23 @@ body {
         display: flex;
         align-items: flex-start;
         padding: 5px 10px;
+        transition: 0.5s all;
 
         &:nth-child(1) #title { background-color: rgba(var(--room-1), 0.4); }
         &:nth-child(2) #title { background-color: rgba(var(--room-2), 0.4); }
         &:nth-child(3) #title { background-color: rgba(var(--room-3), 0.4); }
         &:nth-child(4) #title { background-color: rgba(var(--room-4), 0.4); }
         &:nth-child(5) #title { background-color: rgba(var(--room-5), 0.4); }
+
+        &.active {
+            .window {
+                box-shadow: 0px 0px 5px var(--text-color);
+            }
+
+            #title {
+                background-color: rgba(var(--secondary-color), 0.6);
+            }
+        }
         
         .window {
             max-width: 500px;
@@ -146,6 +157,14 @@ body {
             border-radius: 5px;
             box-shadow: 1px 1px 3px black;
             background-color: var(--terminal-title-color);
+
+            &.active {
+                box-shadow: 0px 0px 5px var(--text-color);
+    
+                #title {
+                    background-color: rgba(var(--secondary-color), 0.6);
+                }
+            }    
             
             #title {
                 display: flex;
@@ -153,6 +172,7 @@ body {
                 border-radius: 3px 3px 0 0;
                 height: 25px;
                 font-weight: bold;
+                transition: 0.5s all;
                 
                 #text {
                     color: rgba(0, 0, 0, 0.75);

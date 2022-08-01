@@ -74,22 +74,10 @@ const rooms = {
         const container = document.querySelector(`#room-container`);
         rooms.forEach(room => container.insertAdjacentElement('beforeend', room));
 
-        container.querySelectorAll('.room').forEach(e => e.addEventListener('click', () => {
-            container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active'));
-            e.classList.add('active');
-        }));
-
-        container.querySelectorAll('.worker').forEach(e => e.addEventListener('click', ev => {
-            ev.stopPropagation();
-            container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active'));
-            e.classList.add('active');
-        }));
-
         const roomContainers = Object.entries(this.list).map(([room, workers]) => {
-            const roomTerminals = workers.map(w => {
-                return this.createTerminal(room, w);
-            });
+            const roomTerminals = workers.map(w => this.createTerminal(room, w));
             const container = document.createElement('div');
+            container.id = `room-${room}`;
             container.classList.add('room-terminal-container');
             roomTerminals.forEach(e => container.insertAdjacentElement('beforeend', e));
             return container;
@@ -98,10 +86,28 @@ const rooms = {
         const frame = document.querySelector(`#frame`);
         frame.innerHTML = '';
         roomContainers.forEach(e => frame.insertAdjacentElement('beforeend', e));
+
+        container.querySelectorAll('.room').forEach(e => e.addEventListener('click', () => {
+            frame.querySelectorAll('.window, .room-terminal-container').forEach(e => e.classList.remove('active'));
+            container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active'));
+            e.classList.add('active');
+            const room = e.id.split('-')[1];
+            frame.querySelector(`#room-${room}`).classList.add('active');
+        }));
+
+        container.querySelectorAll('.worker').forEach(e => e.addEventListener('click', ev => {
+            ev.stopPropagation();
+            frame.querySelectorAll('.window, .room-terminal-container').forEach(e => e.classList.remove('active'));
+            container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active'));
+            e.classList.add('active');
+            const worker = e.id.split('-')[1];
+            frame.querySelector(`#worker-${worker}`).classList.add('active');
+        }));
+
     },
 
     createTerminal: function(room, worker) {
-        console.log(worker)
+        // console.log(worker)
         let lines = [];
         if (worker.terminal && worker.terminal.lines) {
             lines = worker.terminal.lines;
@@ -109,6 +115,7 @@ const rooms = {
 
         worker.terminal = { dom: document.createElement('div'), lines: lines };
         worker.terminal.dom.classList.add('window');
+        worker.terminal.dom.id = `worker-${worker.id}`;
         worker.terminal.dom.innerHTML = `
             <div id="title">
                 <div class="button" id="close"></div>
@@ -125,9 +132,21 @@ const rooms = {
 
         const input = worker.terminal.dom.querySelector('input');
 
-        worker.terminal.dom.addEventListener('click', () => input.focus());
+        worker.terminal.dom.addEventListener('click', () => {
+            const workerName = input.closest('.window').id.split('-')[1];
+            const worker = document.querySelector(`#menu #worker-${workerName}`);
+            if (!worker.classList.contains('active') && !worker.parentNode.classList.contains('active')) {
+                worker.click();
+            }
 
-        input.addEventListener('keypress', e => {
+            input.focus();
+        });
+
+        input.addEventListener('input', e => {
+            e.preventDefault();
+            const inputs = document.querySelectorAll('#frame .window.active input, #frame .room-terminal-container.active .window input');
+            inputs.forEach(i => i.value = input.value);
+
             if (e.key == 'Enter') {
                 if (input.value.length) {
                     socket.emit(worker.id, {
