@@ -3,12 +3,15 @@ const app = express();
 const port = 4200;
 
 const wss = require('./wsserver');
-wss.onClient = (action, socket) => {
-    wss.emit('admin', {
-        action: 'client update',
-        type: action,
-        id: socket.id,
-    })
+wss.onClient = (socket, data) => {
+    if (['join', 'leave'].includes(data.action)) {
+        wss.emit('admin', {
+            action: 'client update',
+            type: data.action,
+            room: data.room,
+            id: socket.id,
+        });
+    }
 }
 
 app.use(express.urlencoded({ extended: true }));

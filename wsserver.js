@@ -73,8 +73,10 @@ wss.on('connection', function(socket) {
 
     // remove client from list
     socket.on('close', () => {
-        Object.values(this.roomList).forEach(room => {
-            delete room[ socket.id ];
+        Object.entries(this.roomList).forEach(([roomId, room]) => {
+            if (room[ socket.id ]) {
+                socket.leave(roomId);
+            }
         });
 
         socket.send(JSON.stringify({
@@ -87,8 +89,8 @@ wss.on('connection', function(socket) {
         }));
 
         if (this.onClient) {
-            this.onClient('disconnect', socket);
-        }    
+            this.onClient(socket, { action: 'disconnect' });
+        }
     });
 
     socket.join = room => {
@@ -96,19 +98,31 @@ wss.on('connection', function(socket) {
             this.roomList[ room ] = {};
         }
         this.roomList[ room ][ socket.id ] = socket;
+
+        if (this.onClient) {
+            this.onClient(socket, { action: 'join', room: room });
+        }
     }
 
     socket.leave = room => {
-        if (this.roomList[ room ] && this.roomList[ room ][ socket.id ]) {
+        if (!this.roomList[ room ]) {
+            return;
+        }
+
+        if (this.roomList[ room ][ socket.id ]) {
             delete this.roomList[ room ][ socket.id ];
         }
-        if (!Object.keys(this.roomList[ room ]).length) {
+        if (!Object.keys(this.roomList[ room ]).length && room != 'everyone') {
             delete this.roomList[ room ];
+        }
+
+        if (this.onClient && room != 'everyone') {
+            this.onClient(socket, { action: 'leave', room: room });
         }
     }
 
     if (this.onClient) {
-        this.onClient('connect', socket);
+        this.onClient(socket, { action: 'connect' });
     }
 });
 
