@@ -28,11 +28,11 @@ socket.connect().then(() => {
             return;
         }
         if (data.action == 'client update') {
+            // console.log(data)
             rooms.add();
             const action = ({ join: 'joined', leave: 'left' })[ data.type ];
-            new Toast(`🚪 Client <span class="bold">${ data.id }</span> ${ action } room <span class="bold">${ data.room }</span>`, { timeOut: 3000 } );
-            if (Object.keys(rooms.list).includes(data.room)) {
-            }
+            new Toast(`🚪 Client <span class="bold">${ data.name || data.id }</span> ${ action } room <span class="bold">${ data.room }</span>`, { timeOut: 3000 } );
+            return;
         }
     });
 });
@@ -57,6 +57,7 @@ const rooms = {
             this.list[name] = data.result;
         }
         else {
+            delete this.list[name];
             new Toast(`👎 Room <span class="bold">${name}</span> not found`, { timeOut: 3000 });
         }
         this.render();    
@@ -65,8 +66,8 @@ const rooms = {
     render: function() {
         let text = Object.entries(this.list).map(([room, workers]) => {
             const workerText = workers.map(w => {
-                return `<div class="worker" id="worker-${w}">
-                    <div class="name">${w}</div>
+                return `<div class="worker" id="worker-${ w.id }">
+                    <div class="name">${ w.name || w.id }</div>
                 </div>`;
             }).join('');
             
@@ -79,7 +80,7 @@ const rooms = {
 
         const terminals = Object.entries(this.list).map(([room, workers]) => {
             return workers.map(w => {
-                return this.createTerminal(`${ room } - ${ w }`);
+                return this.createTerminal(`${ room } - ${ w.name || w.id }`);
             }).join('');
         }).join('');
 

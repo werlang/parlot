@@ -1,4 +1,5 @@
 const express = require('express');
+const fs = require('fs');
 const app = express();
 const port = 4200;
 
@@ -10,7 +11,14 @@ wss.onClient = (socket, data) => {
             type: data.action,
             room: data.room,
             id: socket.id,
+            name: socket.name,
         });
+    }
+}
+
+wss.onServer = (socket, data) => {
+    if (data.action == 'set name') {
+        socket.name = data.name;
     }
 }
 
@@ -32,7 +40,18 @@ app.get('/rooms/:room', async (req, res) => {
         return;
     }
 
-    res.send({ status: 200, result: Object.keys(room) });
+    res.send({ status: 200, result: Object.values(room).map(e => ({
+        id: e.id,
+        name: e.name,
+    })) });
+});
+
+
+app.get('/randomname', async (req, res) => {
+    const words = JSON.parse(fs.readFileSync('words.json'));
+    const index = Math.floor(Math.random() * words.length);
+    const number = Math.floor(Math.random() * 100);
+    res.send({ name: `${words[index]}-${number}` });
 });
 
 

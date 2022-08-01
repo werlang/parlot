@@ -1,11 +1,25 @@
 const { spawn } = require('child_process')
 const fs = require('fs');
+const fetch = require('node-fetch');
 
 const socket = require('./wsclient.js');
 
-socket.connect().then(() => {
+socket.connect().then(async () => {
 
     const config = JSON.parse(fs.readFileSync('config.json'));
+
+    if (!config.name) {
+        const url = 'http://localhost:4200'; // will change after it goes to production
+        const res = await fetch(`${url}/randomname`);
+        const data = await res.json();
+        config.name = data.name;
+        fs.writeFileSync('config.json', JSON.stringify(config));
+    };
+
+    socket.emit('server', {
+        action: 'set name',
+        name: config.name,
+    });
 
     socket.join(config.room, async (data, sender) => {
         if (data.action && data.action == 'execute') {

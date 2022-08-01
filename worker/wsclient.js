@@ -36,6 +36,7 @@ socket.connect = async function () {
         // run callback event for receiving message for a room
         this.ws.onmessage = async event => {
             const msg = JSON.parse(event.data);
+            // console.log(msg)
     
             // if connection first stabilished
             if (msg.room == 'self' && msg.sender == 'server' && msg.data.action == 'connect'){

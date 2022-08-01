@@ -69,6 +69,11 @@ wss.on('connection', function(socket) {
             });
             return;
         }
+
+        // message to the server
+        if (message.room == 'server' && this.onServer) {
+            this.onServer(socket, message.data);
+        }
     });
 
     // remove client from list
