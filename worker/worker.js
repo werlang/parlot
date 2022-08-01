@@ -1,9 +1,13 @@
 const { spawn } = require('child_process')
+const fs = require('fs');
 
 const socket = require('./wsclient.js');
 
 socket.connect().then(() => {
-    socket.join('worker', async (data, sender) => {
+
+    const config = JSON.parse(fs.readFileSync('config.json'));
+
+    socket.join(config.room, async (data, sender) => {
         if (data.action && data.action == 'execute') {
             const res = spawn(data.command, [], { shell: true });
             

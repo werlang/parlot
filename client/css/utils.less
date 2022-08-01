@@ -44,3 +44,168 @@
         }
     }
 }
+
+#fog {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    background-color: #00000090;
+    z-index: 3;
+
+    &.invisible {
+        background-color: transparent;
+    }
+
+    &.dark {
+        background-color: #000;
+    }
+
+    .modal {
+        background-color: var(--secondary-color);
+        color: var(--text-color);
+        border-radius: 3px;
+        box-sizing: border-box;
+        display: flex;
+        border-color: var(--secondary-light-color);
+        box-shadow: 2px 2px 5px black;
+        width: 100%;
+        max-width: 410px;
+        max-height: 100vh;
+
+        #content {
+            display: flex;
+            flex-direction: column;
+            padding: 5px 5px 20px 5px;
+            overflow: hidden auto;
+            flex-grow: 1;
+            box-sizing: border-box;
+            max-height: 90vh;
+            
+            @media @size-400 {
+                padding: 20px 30px;
+            }
+    
+            h2 {
+                margin: 10px 0 20px 0;
+            }
+           
+            .table .empty {
+                font-weight: bold;
+                margin-bottom: 20px;
+                border: 1px solid var(--secondary-light-color);
+                padding: 10px 20px;
+                border-radius: 3px;
+            }    
+                
+            a {
+                color: #2689cc;
+                text-decoration: none;
+                cursor: pointer;    
+            }
+
+            label {
+                span {
+                    opacity: .7;
+                    text-transform: capitalize;
+                    margin-bottom: 10px;
+                    display: block;
+                }
+            }
+
+            .input-text {
+                padding: 10px 15px;
+                margin-bottom: 15px;
+                border-radius: 3px;
+                background-color: var(--secondary-dark-color);
+                border: none;
+                color: var(--text-intense-color);
+                outline: none;
+                border: 1px solid transparent;
+                font-size: 1rem;
+                transition: 0.3s all;
+                display: flex;
+                width: 100%;
+                box-sizing: border-box;
+    
+                &:focus {
+                    border-color: var(--secondary-light-color);
+                }
+    
+                &.red {
+                    border-color: #cc0000;
+                }
+            }
+    
+            .input-container {
+                display: flex;
+                justify-content: space-between;
+    
+                input {
+                    flex-grow: 1;
+                    border-radius: 3px 0 0 3px;
+                }
+    
+                .input-button {
+                    width: 35px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background-color: var(--secondary-dark-color);
+                    color: var(--text-intense-color);
+                    margin-bottom: 15px;
+                    border: none;
+                    border-radius: 0 3px 3px 0;
+                    filter: invert(0.2);
+                    cursor: pointer;
+                    transition: 0.3s all;
+                    font-size: 1rem;
+    
+                    &:hover {
+                        filter: invert(0.3);
+                    }
+                }
+        }
+
+        }
+
+        #button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+
+            button, .button {
+                border: none;
+                border-radius: 3px;
+                height: 35px;
+                width: 200px;
+                outline: none;
+                background-color: var(--main-color);
+                color: var(--text-intense-color);
+                cursor: pointer;
+                transition: 0.3s all;
+                font-size: 1.1rem;
+                margin: 0 5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                &:hover {
+                    filter: brightness(1.2);
+                }
+
+                &:disabled {
+                    background-color: #727272;
+                    box-shadow: none;
+                    cursor: default;
+                    cursor: not-allowed;
+                    filter: none;
+                }
+            }
+        }
+    }
+}

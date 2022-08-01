@@ -1,11 +1,11 @@
-import { Toast } from './utils.js';
+import { Modal, Toast } from './utils.js';
 import { socket } from './wsclient.js'
 
 const terminal = document.querySelector('#terminal');
 const input = document.querySelector('input');
 input.focus();
 
-document.body.addEventListener('click', () => input.focus());
+document.querySelector('#frame').addEventListener('click', () => input.focus());
 
 input.addEventListener('keypress', e => {
     if (e.key == 'Enter') {
@@ -48,6 +48,9 @@ const rooms = {
         if (data.status == 200) {
             this.list[name] = data.result;
         }
+        else {
+            new Toast(`👎 Room ${name} not found`, { timeOut: 3000 });
+        }
         this.render();
     },
 
@@ -68,4 +71,29 @@ const rooms = {
     },
 }
 
-rooms.add('worker');
+document.querySelector('#join-room').addEventListener('click', () => {
+    const modal = new Modal(`<h2>Join room</h2>
+        <label>
+            <span>Room share id</span>
+            <input class="input-text">
+        </label>
+        <div id="button-container"><button>JOIN</button></div>
+    `);
+    
+    const input = modal.domObject.querySelector('input');
+    input.focus();
+    
+    const modalClick = () => {
+        const input = document.querySelector('.modal input');
+        rooms.add(input.value);
+        modal.close();
+    }
+
+    modal.addEvent({ tag: 'input', event: 'keypress', callback: e => {
+        if (e.key == 'Enter') {
+            modalClick();
+        }
+    }});
+    
+    modal.addEvent({ tag: 'button', event: 'click', callback: modalClick});
+});
