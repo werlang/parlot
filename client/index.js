@@ -57,19 +57,33 @@ const rooms = {
     },
 
     renderDOM: function() {
-        let text = Object.entries(this.list).map(([room, workers]) => {
+        const rooms = Object.entries(this.list).map(([room, workers]) => {
             const workerText = workers.map(w => {
                 return `<div class="worker" id="worker-${ w.id }">
                     <div class="name">${ w.name || w.id }</div>
                 </div>`;
             }).join('');
             
-            return `<div class="room" id="room-${room}">
-                <div class="name">${room}</div>
-                ${ workerText }
-            </div>`;
-        }).join('');
-        document.querySelector(`#room-container`).innerHTML = text;
+            const roomEl = document.createElement('div');
+            roomEl.id = `room-${room}`;
+            roomEl.classList.add('room');
+            roomEl.innerHTML = `<div class="name">${room}</div> ${ workerText }`;
+            return roomEl;
+        });
+
+        const container = document.querySelector(`#room-container`);
+        rooms.forEach(room => container.insertAdjacentElement('beforeend', room));
+
+        container.querySelectorAll('.room').forEach(e => e.addEventListener('click', () => {
+            container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active'));
+            e.classList.add('active');
+        }));
+
+        container.querySelectorAll('.worker').forEach(e => e.addEventListener('click', ev => {
+            ev.stopPropagation();
+            container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active'));
+            e.classList.add('active');
+        }));
 
         const roomContainers = Object.entries(this.list).map(([room, workers]) => {
             const roomTerminals = workers.map(w => {
