@@ -90,11 +90,12 @@ const rooms = {
 
         // click on a room on menu
         container.querySelectorAll('.room').forEach(e => e.addEventListener('click', () => {
-            frame.querySelectorAll('.window, .room-terminal-container').forEach(e => e.classList.remove('active'));
+            frame.querySelectorAll('.window, .room-terminal-container').forEach(e => e.classList.remove('active', 'maximized'));
             container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active'));
             e.classList.add('active');
             const room = e.id.split('-')[1];
             frame.querySelector(`#room-${room}`).classList.add('active');
+            frame.querySelectorAll(`#room-${room} .window`).forEach(e => e.classList.remove('closed'));
             
             const firstWorkerId = frame.querySelector(`#room-${room} .window`).id.split('-')[1]
             this.getWorker(firstWorkerId).terminal.dom.querySelector('input').focus();
@@ -103,11 +104,12 @@ const rooms = {
         // click on a worker on menu
         container.querySelectorAll('.worker').forEach(e => e.addEventListener('click', ev => {
             ev.stopPropagation();
-            frame.querySelectorAll('.window, .room-terminal-container').forEach(e => e.classList.remove('active'));
+            frame.querySelectorAll('.window, .room-terminal-container').forEach(e => e.classList.remove('active', 'maximized'));
             container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active'));
             e.classList.add('active');
             const worker = e.id.split('-')[1];
             frame.querySelector(`#worker-${worker}`).classList.add('active');
+            frame.querySelector(`#worker-${worker}`).classList.remove('closed');
             this.getWorker(worker).terminal.dom.querySelector('input').focus();
         }));
 
@@ -180,6 +182,31 @@ const rooms = {
         });
 
         worker.terminal.lines.forEach(l => this.updateTerminal(worker, l, false));
+
+        // close a terminal
+        worker.terminal.dom.querySelector('#close').addEventListener('click', e => {
+            e.stopPropagation();
+            worker.terminal.dom.classList.add('closed');
+            worker.terminal.dom.classList.remove('active', 'maximized');
+            document.querySelectorAll('#frame .window.active, #frame .room-terminal-container.active, #menu .worker.active, #menu .room.active').forEach(e => e.classList.remove('active'));
+        });
+        
+        // maximize terminal
+        worker.terminal.dom.querySelector('#maximize').addEventListener('click', e => {
+            e.stopPropagation();
+            document.querySelectorAll('#frame .window.active, #frame .room-terminal-container.active, #menu .worker.active, #menu .room.active').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('#frame .window').forEach(e => e.classList.remove('maximized'));
+            document.querySelector(`#menu #worker-${ worker.id }`).click();
+            worker.terminal.dom.classList.add('maximized');
+        });
+
+        // minimize terminal
+        worker.terminal.dom.querySelector('#minimize').addEventListener('click', e => {
+            e.stopPropagation();
+            document.querySelectorAll('#frame .window.active, #frame .room-terminal-container.active, #menu .worker.active, #menu .room.active').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('#frame .window').forEach(e => e.classList.remove('maximized'));
+            document.querySelector(`#menu #worker-${ worker.id }`).click();
+        });
 
         return worker.terminal.dom;
     },

@@ -15,6 +15,7 @@ body {
     flex-shrink: 0;
     border-right: 1px solid var(--main-light-color);
     box-shadow: 1px 0px 3px black;
+    box-sizing: border-box;
     
     #logo {
         background-color: var(--main-light-color);  
@@ -157,6 +158,8 @@ body {
             border-radius: 5px;
             box-shadow: 1px 1px 3px black;
             background-color: var(--terminal-title-color);
+            box-sizing: border-box;
+            transition: 0.3s all;
 
             &.active {
                 box-shadow: 0px 0px 5px var(--text-color);
@@ -164,7 +167,29 @@ body {
                 #title {
                     background-color: rgba(var(--secondary-color), 0.6);
                 }
-            }    
+            }
+
+            &.closed { display: none; }
+            
+            &.maximized {
+                max-width: calc(100vw - 305px);
+                position: absolute;
+                margin-left: -8px;
+                margin-top: -9px;
+                box-shadow: none;
+                width: 100vw;
+
+                #title {
+                    border-radius: 0;
+                }
+                #input-container {
+                    border-radius: 0;
+                }
+                .terminal {
+                    height: 100vh;
+                    max-height: calc(100vh - 60px);
+                }
+            }
             
             #title {
                 display: flex;
@@ -198,17 +223,9 @@ body {
                     }
                 }
     
-                #close {
-                    background-color: #f86158;
-                }
-    
-                #minimize {
-                    background-color: #fbbf2d;
-                }
-                
-                #maximize {
-                    background-color: #2ccb43;
-                }
+                #close { background-color: #f86158; }
+                #minimize { background-color: #fbbf2d; }
+                #maximize { background-color: #2ccb43; }
             }
     
             .terminal {
@@ -217,7 +234,7 @@ body {
                 color: var(--terminal-text-color);
                 box-sizing: border-box;
                 overflow-y: auto;
-                max-height: calc(100vh - 60px);
+                max-height: calc(100vh - 80px);
                 font-family: monospace;
                 
                 pre {
