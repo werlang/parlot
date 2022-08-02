@@ -18,21 +18,17 @@ You can also replace *linux* for *windows* or *macos* for executabled for these 
 ./parlot-worker
 ```
 
-3. In the `config.json`, update the *name* and *room* fields.
+3. In the `config.json`, update the *room* and *name* fields.
 
 ```
 {
-    "name": "WORKER_NAME",
     "room": "ROOM_NAME",
-    "wsserver": {
-        "url": "https://parlot.tk",
-        "port": 4210
-    }
+    "name": "WORKER_NAME",
 }
 ```
 
-* **WORKER_NAME** should be any string your worker will be remembered for. If you do not set this field, the worker will be given a random name.
 * **ROOM_NAME** must be a string matching the same room the admin will be working on. If you are not the admin, contact him.
+* **WORKER_NAME** should be any string your worker will be remembered for. If you do not set this field, the worker will be given a random name.
 
 **WARNING: Any admin inside the same room will have full control over your worker.**
 

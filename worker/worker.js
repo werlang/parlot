@@ -1,22 +1,25 @@
 const { spawn } = require('child_process')
 const fs = require('fs');
 const fetch = require('node-fetch');
-const { resolve } = require('path');
 
 const config = {
     path: 'config.json',
+    
+    wsserver: {
+        url: 'https://parlot.tk',
+        port: 4210,
+    },
 
     get: function() {
         try {
             return JSON.parse(fs.readFileSync(this.path));
         }
         catch(error) {
-            const file = { wsserver: {
-                url: 'https://parlot.tk',
-                port: 4210,
-            } };
-            fs.writeFileSync(this.path, JSON.stringify(file));
-            return file;
+            this.save({
+                room: 'ROOM_NAME',
+                name: 'WORKER_NAME',
+            });
+            return {};
         }    
     },
 
@@ -26,7 +29,7 @@ const config = {
 
     createName: async function() {
         const info = this.get();
-        const url = `${ info.wsserver.url }:${ info.wsserver.port }`;
+        const url = `${ this.wsserver.url }:${ this.wsserver.port }`;
         const res = await fetch(`${url}/randomname`);
         const data = await res.json();
 
@@ -40,11 +43,15 @@ if (!config.get().room) {
     console.log('You must inform a room in the config.json file');
     return;
 }
+else if (config.get().room == "ROOM_NAME") {
+    console.log('Change the name of the room in the config.json file, or admins might take advantage of your worker.');
+    return;
+}
 
-const socket = require('./wsclient.js')( config.get().wsserver );
+const socket = require('./wsclient.js')( config.wsserver );
 
 socket.connect().then(async () => {
-    if (!config.get().name) {
+    if (!config.get().name || config.get().name == 'WORKER_NAME') {
         await config.createName();
     }
 
