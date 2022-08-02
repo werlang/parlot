@@ -136,9 +136,9 @@ body {
     .room-terminal-container {
         display: flex;
         align-items: flex-start;
+        flex-wrap: wrap;
         padding: 5px 10px;
         transition: 0.5s all;
-        flex-wrap: wrap;
 
         &:nth-child(1) #title { background-color: rgba(var(--room-1), 0.4); }
         &:nth-child(2) #title { background-color: rgba(var(--room-2), 0.4); }
@@ -157,7 +157,6 @@ body {
         }
         
         .window {
-            max-width: 500px;
             margin: 3px;
             border: 1px solid var(--terminal-title-color);
             border-radius: 5px;
@@ -165,6 +164,11 @@ body {
             background-color: var(--terminal-title-color);
             box-sizing: border-box;
             transition: 0.3s all;
+            max-width: 600px;
+
+            @media @size-1200 {
+                // max-width: 450px;
+            }
 
             &.active {
                 box-shadow: 0px 0px 5px rgb(var(--text-color));
