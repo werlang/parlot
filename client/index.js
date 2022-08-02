@@ -72,6 +72,7 @@ const rooms = {
         });
 
         const container = document.querySelector(`#room-container`);
+        container.innerHTML = '';
         rooms.forEach(room => container.insertAdjacentElement('beforeend', room));
 
         const roomContainers = Object.entries(this.list).map(([room, workers]) => {
@@ -87,14 +88,19 @@ const rooms = {
         frame.innerHTML = '';
         roomContainers.forEach(e => frame.insertAdjacentElement('beforeend', e));
 
+        // click on a room on menu
         container.querySelectorAll('.room').forEach(e => e.addEventListener('click', () => {
             frame.querySelectorAll('.window, .room-terminal-container').forEach(e => e.classList.remove('active'));
             container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active'));
             e.classList.add('active');
             const room = e.id.split('-')[1];
             frame.querySelector(`#room-${room}`).classList.add('active');
+            
+            const firstWorkerId = frame.querySelector(`#room-${room} .window`).id.split('-')[1]
+            this.getWorker(firstWorkerId).terminal.dom.querySelector('input').focus();
         }));
 
+        // click on a worker on menu
         container.querySelectorAll('.worker').forEach(e => e.addEventListener('click', ev => {
             ev.stopPropagation();
             frame.querySelectorAll('.window, .room-terminal-container').forEach(e => e.classList.remove('active'));
@@ -102,6 +108,7 @@ const rooms = {
             e.classList.add('active');
             const worker = e.id.split('-')[1];
             frame.querySelector(`#worker-${worker}`).classList.add('active');
+            this.getWorker(worker).terminal.dom.querySelector('input').focus();
         }));
 
     },
@@ -132,31 +139,43 @@ const rooms = {
 
         const input = worker.terminal.dom.querySelector('input');
 
+        worker.submit = () => {
+            socket.emit(worker.id, {
+                action: 'execute',
+                command: input.value,
+            });
+        }
+
+        // click on a terminal: make it active
         worker.terminal.dom.addEventListener('click', () => {
-            const workerName = input.closest('.window').id.split('-')[1];
-            const worker = document.querySelector(`#menu #worker-${workerName}`);
-            if (!worker.classList.contains('active') && !worker.parentNode.classList.contains('active')) {
-                worker.click();
+            const workerDOM = document.querySelector(`#menu #worker-${ worker.id }`);
+            if (!workerDOM.classList.contains('active') && !workerDOM.parentNode.classList.contains('active')) {
+                workerDOM.click();
             }
 
             input.focus();
         });
 
+        // mimic input value
         input.addEventListener('input', e => {
             e.preventDefault();
             const inputs = document.querySelectorAll('#frame .window.active input, #frame .room-terminal-container.active .window input');
             inputs.forEach(i => i.value = input.value);
+        });
 
+        // when you press enter
+        input.addEventListener('keypress', e => {
             if (e.key == 'Enter') {
                 if (input.value.length) {
-                    socket.emit(worker.id, {
-                        action: 'execute',
-                        command: input.value,
+                    const ids = Array.from(document.querySelectorAll('#frame .window.active, #frame .room-terminal-container.active .window')).map(e => e.id.split('-')[1]);
+                    ids.forEach(id => {
+                        const worker = this.getWorker(id);
+                        worker.submit();
+                        const wInput = worker.terminal.dom.querySelector('input');
+                        this.updateTerminal(worker, `$> ${ wInput.value }`);
+                        wInput.value = '';
                     });
-
-                    this.updateTerminal(worker, `$> ${ input.value }`);
                 }
-                input.value = '';
             }
         });
 
