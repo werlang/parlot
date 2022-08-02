@@ -1,12 +1,9 @@
 const WebSocket = require('ws');
 
-const socket = {
-    serverURL: 'localhost',
-    port: 4210,
-    actionList: {},
-}
+const socket = {};
 
 socket.connect = async function () {
+    this.actionList = {};
     this.running = true;
     return new Promise(resolve => {
         if (this.connected){
@@ -16,18 +13,23 @@ socket.connect = async function () {
         
         this.ws = new WebSocket(`ws://${ this.serverURL }:${ this.port }`);
         
+        this.ws.onerror = () => {
+            console.log('Error connecting to websocket server');
+            resolve(this);
+        }
+
         this.ws.onopen = () => {
-            console.log('connected to websocket server');
+            console.log('Connected to websocket server');
             this.connected = true;
             resolve(this);
         }
     
         this.ws.onclose = () => {
             if (this.connected) {
-                console.log('websocket disconnected');
+                console.log('Websocket disconnected');
             }
             else {
-                console.log('reconnecting to websocket server...');
+                console.log('Reconnecting to websocket server...');
             }
             this.connected = false;
             setTimeout(() => this.connect(), 1000);
@@ -112,4 +114,8 @@ socket.run = function() {
     }, 10);
 }
 
-module.exports = socket;
+module.exports = config => {
+    socket.serverURL = config.url;
+    socket.port = config.port;
+    return socket;
+};
