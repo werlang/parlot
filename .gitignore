@@ -1,3 +1,6 @@
+.conf
 node_modules
-release
+release/linux
+release/macos
+release/windows
 config.json
