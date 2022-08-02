@@ -1,6 +1,7 @@
 const { spawn } = require('child_process')
 const fs = require('fs');
 const fetch = require('node-fetch');
+const { resolve } = require('path');
 
 const config = {
     path: 'config.json',
@@ -35,6 +36,11 @@ const config = {
     }
 }
 
+if (!config.get().room) {
+    console.log('You must inform a room in the config.json file');
+    return;
+}
+
 const socket = require('./wsclient.js')( config.get().wsserver );
 
 socket.connect().then(async () => {
@@ -46,11 +52,6 @@ socket.connect().then(async () => {
         action: 'set name',
         name: config.name,
     });
-
-    if (!config.room) {
-        config.room = 'lobby';
-        config.save();
-    }
 
     socket.join(config.room, async (data, sender) => executeCommand(data));
     socket.join('self', async (data, sender) => executeCommand(data));
