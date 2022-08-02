@@ -54,6 +54,21 @@ app.get('/randomname', async (req, res) => {
     res.send({ name: `${words[index]}-${number}` });
 });
 
+app.get('/install/:os', async (req, res) => {
+    const path = {
+        linux: 'linux/parlot-worker',
+        windows: 'windows/parlot-worker.exe',
+        macos: 'macos/parlot-worker',
+    }
+
+    const filePath = `${__dirname}/release/${ path[ req.params.os ] }`;
+    if (fs.existsSync(filePath)) {
+        res.download(filePath);
+        return;
+    }
+    res.status(404).send({ message: 'This file does not exists.' });
+});
+
 
 app.use((_, res) => res.status(404).send({ message: 'Nothing to be seen here.' }));
 
