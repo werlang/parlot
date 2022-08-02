@@ -27,7 +27,7 @@ socket.connect().then(async () => {
 
 function executeCommand(data) {
     if (data.action && data.action == 'execute') {
-        const res = spawn(data.command, [], { shell: true });
+        const res = spawn(data.command, [], { shell: true, cwd: '/' });
         
         res.stdout.on('data', data => {
             socket.emit('admin', { action: 'command', response: data.toString() });

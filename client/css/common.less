@@ -16,7 +16,7 @@
     --secondary-color: 80, 93, 143;
     --secondary-dark-color: #39446d;
     --secondary-light-color: #7686c9;
-    --text-color: #c5ddc9;
+    --text-color: 197, 221, 201;
     --text-intense-color: #ffffff;
     --text-highlight: #cecf75;
     --room-1: 253, 233, 119;
@@ -24,6 +24,7 @@
     --room-3: 119, 155, 253;
     --room-4: 119, 253, 179;
     --room-5: 242, 119, 253;
+    --trackbar: 145, 145, 145;
 }
 
 body {
@@ -33,4 +34,25 @@ body {
     background-color: var(--terminal-bg-color);
     font-family: 'Roboto', sans-serif;
     height: 100vh;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    border-left: 1px solid rgba(var(--trackbar), 0.3);
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(var(--trackbar), 0);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(var(--trackbar), 0.4);
+}
+
+*:hover > ::-webkit-scrollbar-thumb {
+    background: rgba(var(--trackbar), 0.6);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--trackbar), 1);
 }

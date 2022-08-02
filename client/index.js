@@ -91,7 +91,7 @@ const rooms = {
         // click on a room on menu
         container.querySelectorAll('.room').forEach(e => e.addEventListener('click', () => {
             frame.querySelectorAll('.window, .room-terminal-container').forEach(e => e.classList.remove('active', 'maximized'));
-            container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active'));
+            container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active', 'closed'));
             e.classList.add('active');
             const room = e.id.split('-')[1];
             frame.querySelector(`#room-${room}`).classList.add('active');
@@ -108,6 +108,7 @@ const rooms = {
             container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active'));
             e.classList.add('active');
             const worker = e.id.split('-')[1];
+            document.querySelector(`#menu #worker-${worker}`).classList.remove('closed');
             frame.querySelector(`#worker-${worker}`).classList.add('active');
             frame.querySelector(`#worker-${worker}`).classList.remove('closed');
             this.getWorker(worker).terminal.dom.querySelector('input').focus();
@@ -189,6 +190,7 @@ const rooms = {
             worker.terminal.dom.classList.add('closed');
             worker.terminal.dom.classList.remove('active', 'maximized');
             document.querySelectorAll('#frame .window.active, #frame .room-terminal-container.active, #menu .worker.active, #menu .room.active').forEach(e => e.classList.remove('active'));
+            document.querySelector(`#menu #worker-${ worker.id }`).classList.add('closed');
         });
         
         // maximize terminal
