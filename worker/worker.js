@@ -29,8 +29,7 @@ const config = {
 
     createName: async function() {
         const info = this.get();
-        const url = `${ this.wsserver.url }:${ this.wsserver.port }`;
-        const res = await fetch(`${url}/randomname`);
+        const res = await fetch(`${ this.wsserver }/randomname`);
         const data = await res.json();
 
         info.name = data.name;
