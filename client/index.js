@@ -60,14 +60,14 @@ const rooms = {
         const rooms = Object.entries(this.list).map(([room, workers]) => {
             const workerText = workers.map(w => {
                 return `<div class="worker" id="worker-${ w.id }">
-                    <div class="name">${ w.name || w.id }</div>
+                    <div class="name" title="Click to control this worker">${ w.name || w.id }</div>
                 </div>`;
             }).join('');
             
             const roomEl = document.createElement('div');
             roomEl.id = `room-${room}`;
             roomEl.classList.add('room');
-            roomEl.innerHTML = `<div class="name">${room}</div> ${ workerText }`;
+            roomEl.innerHTML = `<div class="name" title="Click to control the whole room">${room}</div> ${ workerText }`;
             return roomEl;
         });
 
