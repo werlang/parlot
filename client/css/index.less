@@ -36,9 +36,13 @@ body {
         flex-grow: 1;
 
         #button-container {
-            padding: 15px 25px;
+            padding: 15px 0;
             display: flex;
-            justify-content: center;
+            // justify-content: center;
+
+            &:hover #room-placeholder{
+                opacity: 0.2;
+            }
     
             button {
                 display: flex;
@@ -46,7 +50,9 @@ body {
                 justify-content: center;
                 outline: none;
                 border: none;
-                border-radius: 100%;
+                // border-radius: 100%;
+                border-radius: 10px;
+                // background-color: rgba(var(--secondary-color), 1);
                 background-color: rgb(var(--secondary-color));
                 color: rgb(var(--text-color));
                 transition: 0.3s all;
@@ -54,6 +60,9 @@ body {
                 height: 50px;
                 width: 50px;
                 border: 1px solid var(--main-light-color);
+                margin-left: -175px;
+                margin-top: 30px;
+                z-index: 1;
     
                 &:hover {
                     filter: brightness(1.2);
@@ -64,9 +73,41 @@ body {
                     font-size: 2rem;
                 }
             }
+
+            #room-placeholder {
+                white-space: nowrap;
+                display: flex;
+                flex-direction: column;
+                opacity: 0;
+                width: 100%;
+                user-select: none;
+                cursor: default;
+                transition: 0.7s all;
+
+                .room {
+                    padding: 0;
+                    
+                    span {
+                        width: 170px;
+                        background-color: rgba(var(--text-color), 1);
+                        padding: 0;
+                        margin: 0 10px;
+                    }
+                    
+                }
+
+                .worker {
+                    margin: 5px 30px;
+                    padding: 0 5px;
+
+                    span {
+                        background-color: rgba(var(--text-color), 1);
+                    }
+                }
+            }
         }
     
-        #room-container {
+        #room-container, #room-placeholder {
             color: rgb(var(--text-color));
     
             .room {

@@ -6,7 +6,7 @@
     bottom: 0;
     right: 0;
     left: 0;
-    z-index: 4;
+    z-index: -1;
     padding: 0 5px 15px 5px;
 
     &.center {
@@ -14,6 +14,7 @@
     }
 
     .toast {
+        z-index: 4;
         background-color: rgb(var(--secondary-color));
         color: rgb(var(--text-color));
         border: 1px solid var(--main-dark-color);
@@ -71,7 +72,7 @@
         border-radius: 3px;
         box-sizing: border-box;
         display: flex;
-        border-color: var(--secondary-light-color);
+        border-color: rgb(var(--secondary-light-color));
         box-shadow: 2px 2px 5px black;
         width: 100%;
         max-width: 410px;
@@ -97,7 +98,7 @@
             .table .empty {
                 font-weight: bold;
                 margin-bottom: 20px;
-                border: 1px solid var(--secondary-light-color);
+                border: 1px solid rgb(var(--secondary-light-color));
                 padding: 10px 20px;
                 border-radius: 3px;
             }    
@@ -121,7 +122,7 @@
                 padding: 10px 15px;
                 margin-bottom: 15px;
                 border-radius: 3px;
-                background-color: var(--secondary-dark-color);
+                background-color: rgb(var(--secondary-dark-color));
                 border: none;
                 color: var(--text-intense-color);
                 outline: none;
@@ -133,7 +134,7 @@
                 box-sizing: border-box;
     
                 &:focus {
-                    border-color: var(--secondary-light-color);
+                    border-color: rgb(var(--secondary-light-color));
                 }
     
                 &.red {
@@ -155,7 +156,7 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    background-color: var(--secondary-dark-color);
+                    background-color: rgb(var(--secondary-dark-color));
                     color: var(--text-intense-color);
                     margin-bottom: 15px;
                     border: none;
@@ -184,7 +185,7 @@
                 height: 35px;
                 width: 200px;
                 outline: none;
-                background-color: rgb(var(--main-color));
+                background-color: rgb(var(--secondary-light-color));
                 color: var(--text-intense-color);
                 cursor: pointer;
                 transition: 0.3s all;
