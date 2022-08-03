@@ -1,5 +1,5 @@
 export const socket = {
-    serverURL: window.location.hostname,
+    serverURL: 'parlot.tk',
     port: 4210,
     connected: false,
     actionList: {},
@@ -20,12 +20,13 @@ socket.connect = async function () {
             resolve(this);
         }
     
-        this.ws.onclose = () => {
+        this.ws.onclose = err => {
+            console.log(err);
             if (this.connected) {
-                console.log('websocket disconnected');
+                console.log('Websocket disconnected');
             }
             else {
-                console.log('reconnecting to websocket server...');
+                console.log('Reconnecting to websocket server...');
             }
             this.connected = false;
             setTimeout(() => this.connect(), 1000);

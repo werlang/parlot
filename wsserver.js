@@ -11,6 +11,10 @@ module.exports = app => {
     const server = require(config.protocol).createServer(credentials, app).listen(config.port);
     const wss = new WebSocket.Server({ server });
 
+    if (wss) {
+        console.log(`Websocket server connected on port ${ config.port }`);
+    }
+
     wss.roomList = { everyone: [] };
     
     wss.on('connection', function(socket) {
