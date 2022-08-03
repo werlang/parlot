@@ -3,7 +3,7 @@ const fs = require('fs');
 const app = express();
 const port = 4200;
 
-const wss = require('./wsserver');
+const wss = require('./wsserver')(app);
 wss.onClient = (socket, data) => {
     if (['join', 'leave'].includes(data.action) && data.room != 'self') {
         wss.emit('admin', {

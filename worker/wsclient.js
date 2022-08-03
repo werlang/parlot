@@ -11,10 +11,12 @@ socket.connect = async function () {
             return;
         } 
         
-        this.ws = new WebSocket(`ws://${ this.serverURL }:${ this.port }`);
+        const url = `wss://${ this.serverURL }:${ this.port }`;
+        this.ws = new WebSocket(url, { rejectUnauthorized: false });
         
-        this.ws.onerror = () => {
-            console.log('Error connecting to websocket server');
+        this.ws.onerror = err => {
+            console.log(`Error connecting to ${ url }`);
+            console.log(err)
             resolve(this);
         }
 

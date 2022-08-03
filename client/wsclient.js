@@ -12,7 +12,7 @@ socket.connect = async function () {
             return;
         }
         
-        this.ws = new WebSocket(`ws://${ this.serverURL }:${ this.port }`);
+        this.ws = new WebSocket(`wss://${ this.serverURL }:${ this.port }`);
     
         this.ws.onopen = () => {
             console.log('connected to websocket server');

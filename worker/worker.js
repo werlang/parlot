@@ -6,7 +6,7 @@ const config = {
     path: 'config.json',
     
     wsserver: {
-        url: 'https://parlot.tk',
+        url: 'parlot.tk',
         port: 4210,
     },
 
@@ -29,7 +29,7 @@ const config = {
 
     createName: async function() {
         const info = this.get();
-        const res = await fetch(`${ this.wsserver }/randomname`);
+        const res = await fetch(`https://${ this.wsserver.url }/randomname`);
         const data = await res.json();
 
         info.name = data.name;
