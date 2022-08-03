@@ -13,7 +13,7 @@ socket.connect().then(() => {
             // console.log(data)
             rooms.add();
             const action = ({ join: 'joined', leave: 'left' })[ data.type ];
-            new Toast(`🚪 Client <span class="bold">${ data.name || data.id }</span> ${ action } room <span class="bold">${ data.room }</span>`, { timeOut: 3000 } );
+            new Toast(`🚪 Client <span class="bold">${ data.name || data.id }</span> ${ action } room <span class="bold">${ data.room }</span>`, { timeOut: 5000 } );
             return;
         }
     });
@@ -51,7 +51,7 @@ const rooms = {
         }
         else {
             delete this.list[name];
-            new Toast(`👎 Room <span class="bold">${name}</span> not found`, { timeOut: 3000 });
+            new Toast(`👎 Room <span class="bold">${name}</span> not found`, { timeOut: 5000 });
         }
         this.renderDOM();
     },
