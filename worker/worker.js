@@ -56,10 +56,10 @@ socket.connect().then(async () => {
 
     socket.emit('server', {
         action: 'set name',
-        name: config.name,
+        name: config.get().name,
     });
 
-    socket.join(config.room, async (data, sender) => executeCommand(data));
+    socket.join(config.get().room, async (data, sender) => executeCommand(data));
     socket.join('self', async (data, sender) => executeCommand(data));
 });
 
