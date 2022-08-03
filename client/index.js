@@ -93,11 +93,11 @@ const rooms = {
             frame.querySelectorAll('.window, .room-terminal-container').forEach(e => e.classList.remove('active', 'maximized'));
             container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active', 'closed'));
             e.classList.add('active');
-            const room = e.id.split('-')[1];
+            const room = this.getName(e);
             frame.querySelector(`#room-${room}`).classList.add('active');
             frame.querySelectorAll(`#room-${room} .window`).forEach(e => e.classList.remove('closed'));
             
-            const firstWorkerId = frame.querySelector(`#room-${room} .window`).id.split('-')[1]
+            const firstWorkerId = this.getName(frame.querySelector(`#room-${room} .window`));
             this.getWorker(firstWorkerId).terminal.dom.querySelector('input').focus();
         }));
 
@@ -107,7 +107,7 @@ const rooms = {
             frame.querySelectorAll('.window, .room-terminal-container').forEach(e => e.classList.remove('active', 'maximized'));
             container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active'));
             e.classList.add('active');
-            const worker = e.id.split('-')[1];
+            const worker = this.getName(e);
             document.querySelector(`#menu #worker-${worker}`).classList.remove('closed');
             frame.querySelector(`#worker-${worker}`).classList.add('active');
             frame.querySelector(`#worker-${worker}`).classList.remove('closed');
@@ -170,7 +170,7 @@ const rooms = {
         input.addEventListener('keypress', e => {
             if (e.key == 'Enter') {
                 if (input.value.length) {
-                    const ids = Array.from(document.querySelectorAll('#frame .window.active, #frame .room-terminal-container.active .window')).map(e => e.id.split('-')[1]);
+                    const ids = Array.from(document.querySelectorAll('#frame .window.active, #frame .room-terminal-container.active .window')).map(e => this.getName(e));
                     ids.forEach(id => {
                         const worker = this.getWorker(id);
                         worker.submit();
@@ -231,6 +231,10 @@ const rooms = {
         const merged = Object.values(this.list).reduce((p,c) => [...p, ...c], []);
         return merged.find(e => e.id == id);
     },
+
+    getName: function(element) {
+        return element.id.split('-').slice(1).join('-');
+    }
 }
 
 document.querySelector('#join-room').addEventListener('click', () => {
