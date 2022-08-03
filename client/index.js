@@ -128,10 +128,10 @@ const rooms = {
         worker.terminal.dom.id = `worker-${worker.id}`;
         worker.terminal.dom.innerHTML = `
             <div id="title">
-                <div class="button" id="close"></div>
-                <div class="button" id="minimize"></div>
-                <div class="button" id="maximize"></div>
-                <div id="text">${ room } - ${ worker.name || worker.id }</div>
+                <div class="button" id="close" title="Close"></div>
+                <div class="button" id="minimize" title="Restore"></div>
+                <div class="button" id="maximize" title="Maximize"></div>
+                <div id="text">${ worker.name || worker.id } - ${ room }</div>
             </div>
             <div class="terminal"></div>
             <div id="input-container">
