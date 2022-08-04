@@ -263,3 +263,19 @@ document.querySelector('#join-room').addEventListener('click', () => {
     
     modal.addEvent({ tag: 'button', event: 'click', callback: modalClick});
 });
+
+// check localStorage for greetings message
+if (!localStorage.getItem('saw-intro')) {
+    const modal = new Modal(`<h2>Welcome to Parlot</h2>
+        <p>This tool enables system administrators to control several worker machines through CLI all at once. All the while using a beautiful web-based dashboard.</p>
+        <p>Worker machines will execute any command you order them. Download and run the worker-client on the left menu, on the bottom.</p>
+        <p>You, as an admin, need to join the same room as your workers. For that, click on the + button on the left menu.</p>
+        <p>I don't want to extend myself, so for more information, visit our <a href="https://github.com/werlang/parlot" target="_blank">GitHub</a>.</p>
+        <div id="button-container"><button>Got It</button></div>
+    `, { fog: { close: false } });
+
+    modal.addEvent({ tag: 'button', event: 'click', callback: () => {
+        localStorage.setItem('saw-intro', true);
+        modal.close();
+    }});
+}
