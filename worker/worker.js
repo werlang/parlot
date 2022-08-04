@@ -8,6 +8,7 @@ const config = {
     wsserver: {
         url: 'parlot.tk',
         port: 4210,
+        secure: true,
     },
 
     get: function() {
@@ -29,13 +30,18 @@ const config = {
 
     createName: async function() {
         const info = this.get();
-        const res = await fetch(`https://${ this.wsserver.url }/randomname`);
+        const res = await fetch(`${ this.wsserver.secure ? 'https' : 'http' }://${ this.wsserver.url }/randomname`);
         const data = await res.json();
 
         info.name = data.name;
         this.save(info);
         return data.name;
     }
+}
+
+if (config.get().production === false) {
+    config.wsserver.secure = false;
+    config.wsserver.url = 'localhost';
 }
 
 if (!config.get().room) {

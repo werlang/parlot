@@ -4,12 +4,17 @@ const fs = require('fs');
 
 module.exports = app => {
     const config = JSON.parse(fs.readFileSync('config.json'));
-    const credentials = (path => ({
-        key: fs.readFileSync(path.key),
-        cert: fs.readFileSync(path.cert),
-    }))(config.credentials);
-    const server = require(config.protocol).createServer(credentials, app).listen(config.port);
-    const wss = new WebSocket.Server({ server });
+    const wss = (() => {
+        if (config.production === true) {
+            const credentials = (path => ({
+                key: fs.readFileSync(path.key),
+                cert: fs.readFileSync(path.cert),
+            }))(config.credentials);
+            const server = require(config.protocol).createServer(credentials, app).listen(config.port);
+            return new WebSocket.Server({ server });
+        }
+        return new WebSocket.Server({ port: config.port });
+    })();
 
     if (wss) {
         console.log(`Websocket server connected on port ${ config.port }`);

@@ -11,7 +11,7 @@ socket.connect = async function () {
             return;
         } 
         
-        const url = `wss://${ this.serverURL }:${ this.port }`;
+        const url = `${ this.protocol }://${ this.serverURL }:${ this.port }`;
         this.ws = new WebSocket(url, { rejectUnauthorized: false });
         
         this.ws.onerror = err => {
@@ -21,7 +21,7 @@ socket.connect = async function () {
         }
 
         this.ws.onopen = () => {
-            console.log('Connected to websocket server');
+            console.log(`Connected to websocket server at ${ url }`);
             this.connected = true;
             resolve(this);
         }
@@ -119,5 +119,6 @@ socket.run = function() {
 module.exports = config => {
     socket.serverURL = config.url;
     socket.port = config.port;
+    socket.protocol = config.secure ? 'wss' : 'ws';
     return socket;
 };
