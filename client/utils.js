@@ -116,6 +116,10 @@ class Modal {
     close() {
         this.domObject.parentNode.remove();
     }
+
+    getDOMElement() {
+        return this.domObject;
+    }
 }
 
 

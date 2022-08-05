@@ -279,11 +279,14 @@ if (!localStorage.getItem('saw-intro')) {
         <p>Worker machines will execute any command you order them. Download and run the worker-client on the left menu, on the bottom.</p>
         <p>You, as an admin, need to join the same room as your workers. For that, click on the + button on the left menu.</p>
         <p>I don't want to extend myself, so for more information, visit our <a href="https://github.com/werlang/parlot" target="_blank">GitHub</a>.</p>
+        <div><label class="checkbox"><input type="checkbox" id="no-show">Do not show me this again</label></div>
         <div id="button-container"><button>Got It</button></div>
     `, { fog: { close: false } });
 
-    modal.addEvent({ tag: 'button', event: 'click', callback: () => {
-        localStorage.setItem('saw-intro', true);
+    modal.addEvent({ tag: 'button', event: 'click', callback: e => {
+        if (modal.getDOMElement().querySelector('#no-show').checked) {
+            localStorage.setItem('saw-intro', true);
+        }
         modal.close();
     }});
 }
