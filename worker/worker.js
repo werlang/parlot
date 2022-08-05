@@ -12,7 +12,6 @@ const config = {
     
     wsserver: {
         url: 'parlot.tk',
-        port: 4210,
         secure: true,
     },
 
@@ -49,6 +48,7 @@ const config = {
 if (config.get().production === false) {
     config.wsserver.secure = false;
     config.wsserver.url = 'localhost';
+    config.wsserver.port = 4210;
     config.wsserver.serverPort = 4200;
 }
 

@@ -1,7 +1,7 @@
 export const socket = {
-    serverURL: window.location.hostname,
+    serverURL: window.location.hostname == 'localhost' ? 'localhost' : 'ws.parlot.tk',
     protocol: window.location.protocol == 'https:' ? 'wss' : 'ws',
-    port: 4210,
+    port: window.location.hostname == 'localhost' ? ':4210' : '',
     connected: false,
     actionList: {},
 }
@@ -13,7 +13,7 @@ socket.connect = async function () {
             return;
         }
         
-        this.ws = new WebSocket(`${ this.protocol }://${ this.serverURL }:${ this.port }`);
+        this.ws = new WebSocket(`${ this.protocol }://${ this.serverURL }${ this.port }`);
     
         this.ws.onopen = () => {
             console.log('connected to websocket server');

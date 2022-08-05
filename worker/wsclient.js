@@ -11,7 +11,8 @@ socket.connect = async function () {
             return;
         } 
         
-        const url = `${ this.protocol }://${ this.serverURL }:${ this.port }`;
+        const port = this.port ? `:${ this.port }` : '';
+        const url = `${ this.protocol }://${ this.serverURL }${ port }`;
         this.ws = new WebSocket(url, { rejectUnauthorized: false });
         
         this.ws.onerror = err => {
