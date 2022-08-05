@@ -1,6 +1,11 @@
-const { spawn } = require('child_process')
+const { spawn } = require('child_process');
 const fs = require('fs');
 const fetch = require('node-fetch');
+
+const readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout,
+});
 
 const config = {
     path: 'config.json',
@@ -29,10 +34,12 @@ const config = {
     },
 
     createName: async function() {
-        const info = this.get();
-        const res = await fetch(`${ this.wsserver.secure ? 'https' : 'http' }://${ this.wsserver.url }/randomname`);
+        const protocol = this.wsserver.secure ? 'https' : 'http';
+        const serverPort = this.wsserver.serverPort ? `:${this.wsserver.serverPort}` : '';
+        const res = await fetch(`${ protocol }://${ this.wsserver.url }${ serverPort }/randomname`);
         const data = await res.json();
-
+        
+        const info = this.get();
         info.name = data.name;
         this.save(info);
         return data.name;
@@ -42,23 +49,55 @@ const config = {
 if (config.get().production === false) {
     config.wsserver.secure = false;
     config.wsserver.url = 'localhost';
-}
-
-if (!config.get().room) {
-    console.log('You must inform a room in the config.json file');
-    return;
-}
-else if (config.get().room == "ROOM_NAME") {
-    console.log('Change the name of the room in the config.json file, or admins might take advantage of your worker.');
-    return;
+    config.wsserver.serverPort = 4200;
 }
 
 const socket = require('./wsclient.js')( config.wsserver );
 
-socket.connect().then(async () => {
-    if (!config.get().name || config.get().name == 'WORKER_NAME') {
-        await config.createName();
-    }
+(async () => {
+    await new Promise(resolve => {
+        const cfg = config.get();
+        if (cfg.room && cfg.room != "ROOM_NAME") {
+            resolve(cfg.room);
+            return;
+        }
+    
+        console.log('Welcome to Parlot. This is the worker client, and it is used to allow admins to take control over your machine. Only proceed if you agree and know what you are doing.\n');
+    
+        readline.question(`Please inform the name of the room you wish to join: `, room => {
+            cfg.room = room;
+            config.save(cfg);
+            console.log(`Joined room ${ room }\n`);
+            resolve(cfg.room);
+        });
+    });
+
+    await new Promise(resolve => {
+        const cfg = config.get();
+        if (config.get().name && config.get().name != "WORKER_NAME") {
+            resolve(cfg.name);
+            return;
+        }
+    
+        console.log('Now we will set up the name your machine will be known for. If you don\'t want to set any, leave it blank and I will choose one for you.\n')
+    
+        readline.question(`Please inform this worker's name: `, name => {
+            const setName = name => {
+                cfg.name = name;
+                config.save(cfg);
+                console.log(`From now on this worker will be known as ${ name }!\n`);
+                resolve(name);    
+            }
+
+            if (name === '') {
+                config.createName().then(name => setName(name));
+                return;
+            }
+            setName(name);
+        });
+    });
+
+    await socket.connect();
 
     socket.emit('server', {
         action: 'set name',
@@ -67,7 +106,11 @@ socket.connect().then(async () => {
 
     socket.join(config.get().room, async (data, sender) => executeCommand(data));
     socket.join('self', async (data, sender) => executeCommand(data));
-});
+
+    readline.close();
+})();
+
+
 
 function executeCommand(data) {
     if (data.action && data.action == 'execute') {

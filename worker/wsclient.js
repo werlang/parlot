@@ -21,7 +21,7 @@ socket.connect = async function () {
         }
 
         this.ws.onopen = () => {
-            console.log(`Connected to websocket server at ${ url }`);
+            console.log(`Connected to Websocket server at ${ url }`);
             this.connected = true;
             resolve(this);
         }
