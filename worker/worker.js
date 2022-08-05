@@ -11,7 +11,7 @@ const config = {
     path: 'config.json',
     
     wsserver: {
-        url: 'parlot.tk',
+        url: 'ws.parlot.tk',
         secure: true,
     },
 
