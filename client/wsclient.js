@@ -31,6 +31,10 @@ socket.connect = async function () {
             }
             this.connected = false;
             setTimeout(() => this.connect(), 1000);
+
+            if (this.onClose) {
+                this.onClose();
+            }
         }
     
         // run callback event for receiving message for a room

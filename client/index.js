@@ -1,7 +1,9 @@
 import { Modal, Toast } from './utils.js';
 import { socket } from './wsclient.js'
 
-socket.connect().then(() => {
+socket.connect().then(skt => {
+    new Toast(`Connected to the Websocket server`, { timeOut: 5000 });
+
     socket.join('admin', (data, sender) => {
         // console.log(data)
         if (data.action == 'command') {
@@ -12,12 +14,18 @@ socket.connect().then(() => {
         if (data.action == 'client update') {
             // console.log(data)
             rooms.add();
-            const action = ({ join: 'joined', leave: 'left' })[ data.type ];
-            new Toast(`🚪 Client <span class="bold">${ data.name || data.id }</span> ${ action } room <span class="bold">${ data.room }</span>`, { timeOut: 5000 } );
+            if (data.id != skt.id) {
+                const action = ({ join: 'joined', leave: 'left' })[ data.type ];
+                new Toast(`🚪 Client <span class="bold">${ data.name || data.id }</span> ${ action } room <span class="bold">${ data.room }</span>`, { timeOut: 5000 } );
+            }
             return;
         }
     });
 });
+
+socket.onClose = () => {
+    new Toast(`Disconnected from Websocket server. Retrying connection...`, { timeOut: 5000 });
+}
 
 const rooms = {
     list: {},
