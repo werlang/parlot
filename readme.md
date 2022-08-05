@@ -7,7 +7,7 @@ This tool enables system administrators to control several worker machines throu
 1. Download worker client software for your OS:
 
 ```
-wget https://parlot.tk/install/linux
+wget https://parlot.tk/download/linux
 ```
 
 You can also replace *linux* for *windows* or *macos* for binary files for these systems.

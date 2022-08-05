@@ -54,7 +54,7 @@ app.get('/randomname', async (req, res) => {
     res.send({ name: `${words[index]}-${number}` });
 });
 
-app.get('/install/:os', async (req, res) => {
+app.get('/download/:os', async (req, res) => {
     const path = {
         linux: 'linux/parlot-worker',
         windows: 'windows/parlot-worker.exe',
