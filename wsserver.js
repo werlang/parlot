@@ -2,6 +2,21 @@ const WebSocket  = require('ws');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 
+
+// for nginx proxy your websocket service, replace location / on vhosts conf file with this:
+// location / {
+//     proxy_set_header HOST $host;
+//     proxy_set_header X- Real - IP $remote_addr;
+//     proxy_set_header X - Forwarded - For $proxy_add_x_forwarded_for;
+//     proxy_set_header X - Forwarded - Proto $scheme;
+//     proxy_pass_request_headers on;
+//     proxy_pass http://YOUR_SERVER_IP:WEBSOCKET_PORT;
+//     proxy_http_version 1.0;
+//     proxy_set_header Upgrade $http_upgrade;
+//     proxy_set_header Connection "Upgrade";
+// }
+
+
 module.exports = app => {
     const config = JSON.parse(fs.readFileSync('config.json'));
     const wss = (() => {

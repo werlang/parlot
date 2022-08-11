@@ -1,5 +1,6 @@
 import { Modal, Toast } from './utils.js';
-import { socket } from './wsclient.js'
+import { socket } from './wsclient.js';
+import './font-awesome.js';
 
 socket.connect().then(skt => {
     new Toast(`Connected to the Websocket server`, { timeOut: 5000 });

@@ -4,3 +4,4 @@ release/linux
 release/macos
 release/windows
 config.json
+cwp_stats
