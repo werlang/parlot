@@ -7,6 +7,21 @@ const readline = require('readline').createInterface({
     output: process.stdout,
 });
 
+const args = {};
+
+process.argv.forEach((val, index, array) => {
+    if ((val == '-r' || val == '--room') && array[index+1]){
+        args.room = array[index+1];
+    }
+    if ((val == '-n' || val == '--name') && array[index+1]){
+        args.name = array[index+1];
+    }
+    if ((val == '-a' || val == '--auto')){
+        args.auto = true;
+    }
+});
+
+
 const config = {
     path: 'config.json',
     
@@ -16,14 +31,23 @@ const config = {
     },
 
     get: function() {
+        const template = {
+            room: 'ROOM_NAME',
+            name: 'WORKER_NAME',
+        };
+
+        if (args.room) {
+            template.room = args.room;
+        }
+        if (args.name) {
+            template.name = args.name;
+        }
+
         try {
             return JSON.parse(fs.readFileSync(this.path));
         }
         catch(error) {
-            this.save({
-                room: 'ROOM_NAME',
-                name: 'WORKER_NAME',
-            });
+            this.save(template);
             return {};
         }    
     },
@@ -79,16 +103,21 @@ const socket = require('./wsclient.js')( config.wsserver );
             return;
         }
     
+        const setName = name => {
+            cfg.name = name;
+            config.save(cfg);
+            console.log(`From now on this worker will be known as ${ name }!\n`);
+            resolve(name);    
+        }
+
+        if (args.auto) {
+            config.createName().then(name => setName(name));
+            return;
+        }
+
         console.log('Now we will set up the name your machine will be known for. If you don\'t want to set any, leave it blank and I will choose one for you.\n')
     
         readline.question(`Please inform this worker's name: `, name => {
-            const setName = name => {
-                cfg.name = name;
-                config.save(cfg);
-                console.log(`From now on this worker will be known as ${ name }!\n`);
-                resolve(name);    
-            }
-
             if (name === '') {
                 config.createName().then(name => setName(name));
                 return;
