@@ -14,7 +14,7 @@ socket.connect().then(skt => {
         }
         if (data.action == 'client update') {
             // console.log(data)
-            rooms.add();
+            rooms.update();
             if (data.id != skt.id) {
                 const action = ({ join: 'joined', leave: 'left' })[ data.type ];
                 new Toast(`🚪 Client <span class="bold">${ data.name || data.id }</span> ${ action } room <span class="bold">${ data.room }</span>`, { timeOut: 5000 } );
@@ -31,9 +31,23 @@ socket.onClose = () => {
 const rooms = {
     list: {},
 
-    add: async function(name) {
+    join: function(name) {
+        if (!this.list[name]) {
+            this.list[name] = [];
+        }
+        this.update(name);
+    },
+
+    leave: function(name) {
+        delete this.list[name];
+        this.selected = null;
+        document.querySelector('#menu #button-container #leave-room').setAttribute('disabled', true);
+        this.renderDOM();
+    },
+    
+    update: async function(name) {
         if (!name) {
-            Object.keys(this.list).forEach(room => this.add(room));
+            Object.keys(this.list).forEach(room => this.update(room));
             return;
         }
 
@@ -59,8 +73,8 @@ const rooms = {
             })
         }
         else {
-            delete this.list[name];
-            new Toast(`👎 Room <span class="bold">${name}</span> not found`, { timeOut: 5000 });
+            new Toast(`😢 No workers in room <span class="bold">${name}</span>`, { timeOut: 5000 });
+            this.list[name] = [];
         }
         this.renderDOM();
     },
@@ -99,15 +113,32 @@ const rooms = {
 
         // click on a room on menu
         container.querySelectorAll('.room').forEach(e => e.addEventListener('click', () => {
+            const room = this.getName(e);
+
             frame.querySelectorAll('.window, .room-terminal-container').forEach(e => e.classList.remove('active', 'maximized'));
             container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active', 'closed'));
+
+            // already selected. disable 
+            if (this.selected == room){
+                this.selected = null;
+                document.querySelector('#menu #button-container #leave-room').setAttribute('disabled', true);
+
+                return;
+            }
+            
+            // enable this room's actions
+            this.selected = room;
+            document.querySelector('#menu #button-container #leave-room').removeAttribute('disabled', true);
+
             e.classList.add('active');
-            const room = this.getName(e);
             frame.querySelector(`#room-${room}`).classList.add('active');
             frame.querySelectorAll(`#room-${room} .window`).forEach(e => e.classList.remove('closed'));
             
-            const firstWorkerId = this.getName(frame.querySelector(`#room-${room} .window`));
-            this.getWorker(firstWorkerId).terminal.dom.querySelector('input').focus();
+            const firstWindow = frame.querySelector(`#room-${room} .window`);
+            if (firstWindow) {
+                const firstWorkerId = this.getName(firstWindow);
+                this.getWorker(firstWorkerId).terminal.dom.querySelector('input').focus();            
+            }
         }));
 
         // click on a worker on menu
@@ -249,7 +280,7 @@ const rooms = {
 document.querySelector('#join-room').addEventListener('click', () => {
     const modal = new Modal(`<h2>Join room</h2>
         <label>
-            <span>Room share id</span>
+            <span>Room identifier (name)</span>
             <input class="input-text">
         </label>
         <div id="button-container"><button>JOIN</button></div>
@@ -260,7 +291,7 @@ document.querySelector('#join-room').addEventListener('click', () => {
     
     const modalClick = () => {
         const input = document.querySelector('.modal input');
-        rooms.add(input.value);
+        rooms.join(input.value);
         modal.close();
     }
 
@@ -271,6 +302,23 @@ document.querySelector('#join-room').addEventListener('click', () => {
     }});
     
     modal.addEvent({ tag: 'button', event: 'click', callback: modalClick});
+});
+
+
+document.querySelector('#leave-room').addEventListener('click', () => {
+    const modal = new Modal(`<h2>Leave room</h2>
+        <p>Do you really want to leave room <span class="highlight">${ rooms.selected }</span>?</p>
+        <div id="button-container">
+            <button id="yes">Yes</button>
+            <button id="no">No</button>
+        </div>
+    `, { buttonClose: 'no' });
+
+    modal.addEvent({ id:"yes", event: `click`, callback: () => {
+        rooms.leave(rooms.selected);
+        modal.close();
+    }})
+
 });
 
 // check localStorage for greetings message

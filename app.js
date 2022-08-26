@@ -36,7 +36,7 @@ app.get('/rooms/:room', async (req, res) => {
     let room = wss.roomList[ req.params.room ];
 
     if (!room) {
-        res.status(404).send({ status: 404, message: 'Room not found' });
+        res.status(404).send({ status: 404, message: 'No workers in the room' });
         return;
     }
 
