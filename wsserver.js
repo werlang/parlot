@@ -106,6 +106,15 @@ module.exports = app => {
             if (message.room == 'server' && this.onServer) {
                 this.onServer(socket, message.data);
             }
+
+            // if this is a ping message (message to keep connection alive)
+            if (message.room == 'server' && message.data == 'ping') {
+                socket.send(JSON.stringify({
+                    room: `reply-${ message.timestamp }`,
+                    data: 'pong',
+                    sender: 'server',
+                }));
+            }
         });
     
         // remove client from list

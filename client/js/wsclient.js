@@ -16,8 +16,12 @@ socket.connect = async function () {
         this.ws = new WebSocket(`${ this.protocol }://${ this.serverURL }${ this.port }`);
     
         this.ws.onopen = () => {
-            console.log('connected to websocket server');
+            console.log('Connected to websocket server');
             this.connected = true;
+
+            // send ping every 30s to server to keep connection alive
+            this.ping = setInterval(() => this.emit('server', 'ping'), 30000);
+
             resolve(this);
         }
     
@@ -30,6 +34,7 @@ socket.connect = async function () {
                 console.log('Reconnecting to websocket server...');
             }
             this.connected = false;
+            clearInterval(this.ping);
             setTimeout(() => this.connect(), 1000);
 
             if (this.onClose) {
