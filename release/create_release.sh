@@ -1,10 +1,16 @@
 #!/bin/bash
 
-pkg ../worker/worker.js
-mv worker-linux linux/parlot-worker
-mv worker-macos macos/parlot-worker
-mv worker-win.exe windows/parlot-worker.exe
+path="/home/parlot"
 
-chmod +x linux/parlot_worker
-chmod +x macos/parlot_worker
-chmod +x windows/parlot_worker.exe
+pkg -t node16-linux "$path/worker/worker.js"
+mv worker "$path/release/linux/parlot-worker"
+
+pkg -t node16-macos "$path/worker/worker.js"
+mv worker "$path/release/macos/parlot-worker"
+
+pkg -t node16-windows "$path/worker/worker.js"
+mv worker.exe "$path/release/windows/parlot-worker.exe"
+
+chmod +x "$path/release/linux/parlot-worker"
+chmod +x "$path/release/macos/parlot-worker"
+chmod +x "$path/release/windows/parlot-worker.exe"
