@@ -106,15 +106,6 @@ module.exports = app => {
             if (message.room == 'server' && this.onServer) {
                 this.onServer(socket, message.data);
             }
-
-            // if this is a ping message (message to keep connection alive)
-            if (message.room == 'server' && message.data == 'ping') {
-                socket.send(JSON.stringify({
-                    room: `reply-${ message.timestamp }`,
-                    data: 'pong',
-                    sender: 'server',
-                }));
-            }
         });
     
         // remove client from list
@@ -180,6 +171,15 @@ module.exports = app => {
             data: data,
         })));
     }
+
+    // broadcast ping every 30s to keep connection alive
+    setInterval(() => {
+        Object.values(this.roomList.everyone).forEach(client => client.send(JSON.stringify({
+            room: 'self',
+            sender: 'server',
+            data: { action: 'ping' },
+        })));
+    }, 30000);
 
     return wss;
 };
