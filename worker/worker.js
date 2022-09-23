@@ -89,9 +89,9 @@ const socket = require('./wsclient.js')( config.wsserver );
         console.log('Welcome to Parlot. This is the worker client, and it is used to allow admins to take control over your machine. Only proceed if you agree and know what you are doing.\n');
     
         readline.question(`Please inform the name of the room you wish to join: `, room => {
-            cfg.room = room;
+            cfg.room = room == '' ? 'lobby' : room;
             config.save(cfg);
-            console.log(`Joined room ${ room }\n`);
+            console.log(`Joined room ${ cfg.room }\n`);
             resolve(cfg.room);
         });
     });

@@ -1,4 +1,20 @@
 {
+  "name": "parlot",
+  "description": "Speak to worker machines, watch them all execute your commands.",
+  "version": "0.1.0",
+  "scripts": {
+    "start": "node app.js",
+    "release": "release/create_release.sh",
+    "worker": "cd worker && node worker.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/werlang/parlot"
+  },
+  "keywords": [],
+  "author": "Pablo Welrlang",
+  "license": "GPL-3.0-only",
+  "homepage": "https://parlot.tk",
   "dependencies": {
     "express": "^4.18.1",
     "mysql2": "^2.3.3",
