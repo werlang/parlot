@@ -17,7 +17,9 @@ socket.connect().then(skt => {
             rooms.update();
             if (data.id != skt.id) {
                 const action = ({ join: 'joined', leave: 'left' })[ data.type ];
-                new Toast(`🚪 Client <span class="bold">${ data.name || data.id }</span> ${ action } room <span class="bold">${ data.room }</span>`, { timeOut: 5000 } );
+                const message = `🚪 Client <span class="bold">${ data.name || data.id }</span> ${ action } room <span class="bold">${ data.room }</span>`;
+                new Toast(message, { timeOut: 5000 } );
+                console.log(message);
             }
             return;
         }
@@ -32,6 +34,7 @@ const rooms = {
     list: {},
 
     join: function(name) {
+        if (name === '') return;
         if (!this.list[name]) {
             this.list[name] = [];
         }
@@ -42,6 +45,7 @@ const rooms = {
         delete this.list[name];
         this.selected = null;
         document.querySelector('#menu #button-container #leave-room').setAttribute('disabled', true);
+        document.querySelector('#menu #button-container #queue-toggle').setAttribute('disabled', true);
         this.renderDOM();
     },
     
@@ -77,6 +81,10 @@ const rooms = {
             this.list[name] = [];
         }
         this.renderDOM();
+    },
+
+    select: function() {
+
     },
 
     renderDOM: function() {
@@ -118,17 +126,19 @@ const rooms = {
             frame.querySelectorAll('.window, .room-terminal-container').forEach(e => e.classList.remove('active', 'maximized'));
             container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active', 'closed'));
 
-            // already selected. disable 
+            // already selected. disable
             if (this.selected == room){
                 this.selected = null;
                 document.querySelector('#menu #button-container #leave-room').setAttribute('disabled', true);
+                document.querySelector('#menu #button-container #queue-toggle').setAttribute('disabled', true);
 
                 return;
             }
             
             // enable this room's actions
             this.selected = room;
-            document.querySelector('#menu #button-container #leave-room').removeAttribute('disabled', true);
+            document.querySelector('#menu #button-container #leave-room').removeAttribute('disabled');
+            document.querySelector('#menu #button-container #queue-toggle').removeAttribute('disabled');
 
             e.classList.add('active');
             frame.querySelector(`#room-${room}`).classList.add('active');
@@ -146,12 +156,22 @@ const rooms = {
             ev.stopPropagation();
             frame.querySelectorAll('.window, .room-terminal-container').forEach(e => e.classList.remove('active', 'maximized'));
             container.querySelectorAll('.worker, .room').forEach(e => e.classList.remove('active'));
-            e.classList.add('active');
+
             const worker = this.getName(e);
+            if (this.selectedWorker == worker) {
+                this.selectedWorker = null;
+                document.querySelector('#menu #button-container #queue-toggle').setAttribute('disabled', true);
+                return;
+            }
+
+            e.classList.add('active');
             document.querySelector(`#menu #worker-${worker}`).classList.remove('closed');
             frame.querySelector(`#worker-${worker}`).classList.add('active');
             frame.querySelector(`#worker-${worker}`).classList.remove('closed');
             this.getWorker(worker).terminal.dom.querySelector('input').focus();
+
+            document.querySelector('#menu #button-container #queue-toggle').removeAttribute('disabled');
+            this.selectedWorker = worker;
         }));
 
     },
@@ -291,7 +311,9 @@ document.querySelector('#join-room').addEventListener('click', () => {
     
     const modalClick = () => {
         const input = document.querySelector('.modal input');
-        rooms.join(input.value);
+        if (input.value.length) {
+            rooms.join(input.value);
+        }
         modal.close();
     }
 
@@ -320,6 +342,40 @@ document.querySelector('#leave-room').addEventListener('click', () => {
     }})
 
 });
+
+
+const queue = {
+    enabled: false,
+
+    list: {},
+};
+
+// JSON.parse(localStorage.getItem('queue') || '{}');
+
+
+document.querySelector('#queue-toggle').addEventListener('click', () => {
+    if (rooms.selectedWorker || rooms.selected) {
+        new Toast(`⏳ Commands will now be queued by workers`, { timeOut: 5000 });
+    }
+    else {
+        new Toast(`❗ Command queue is disabled`, { timeOut: 5000 });
+
+    }
+    // const modal = new Modal(`<h2>Leave room</h2>
+    //     <p>Do you really want to leave room <span class="highlight">${ rooms.selected }</span>?</p>
+    //     <div id="button-container">
+    //         <button id="yes">Yes</button>
+    //         <button id="no">No</button>
+    //     </div>
+    // `, { buttonClose: 'no' });
+
+    // modal.addEvent({ id:"yes", event: `click`, callback: () => {
+    //     rooms.leave(rooms.selected);
+    //     modal.close();
+    // }})
+
+});
+
 
 // check localStorage for greetings message
 if (!localStorage.getItem('saw-intro')) {
