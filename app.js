@@ -20,6 +20,9 @@ wss.onServer = (socket, data) => {
     if (data.action == 'set name') {
         socket.name = data.name;
     }
+    if (data.action == 'pong') {
+        // console.log(socket.id + ' is alive');
+    }
 }
 
 app.use(express.urlencoded({ extended: true }));

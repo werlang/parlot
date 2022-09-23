@@ -50,7 +50,7 @@ socket.connect = async function () {
             }
             // ping connection sent by server to keep connection alive
             if (msg.room == 'self' && msg.sender == 'server' && msg.data.action == 'ping'){
-                this.ws.send(JSON.stringify({ data: 'pong' }));
+                this.ws.send(JSON.stringify({ room: 'server', data: { action: 'pong' } }));
                 return;
             }
     

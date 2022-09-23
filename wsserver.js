@@ -174,7 +174,7 @@ module.exports = app => {
 
     // broadcast ping every 30s to keep connection alive
     setInterval(() => {
-        Object.values(this.roomList.everyone).forEach(client => client.send(JSON.stringify({
+        Object.values(wss.roomList.everyone).forEach(client => client.send(JSON.stringify({
             room: 'self',
             sender: 'server',
             data: { action: 'ping' },
