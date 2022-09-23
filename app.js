@@ -58,13 +58,7 @@ app.get('/randomname', async (req, res) => {
 });
 
 app.get('/download/:os', async (req, res) => {
-    const path = {
-        linux: 'linux/parlot-worker',
-        windows: 'windows/parlot-worker.exe',
-        macos: 'macos/parlot-worker',
-    }
-
-    const filePath = `${__dirname}/release/${ path[ req.params.os ] }`;
+    const filePath = `${__dirname}/release/parlot-worker-${ req.params.os }.zip`;
     if (fs.existsSync(filePath)) {
         res.download(filePath);
         return;

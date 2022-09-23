@@ -1,7 +1,5 @@
 .conf
 node_modules
-release/linux
-release/macos
-release/windows
+release/*.zip
 config.json
 cwp_stats
