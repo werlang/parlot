@@ -250,15 +250,15 @@ const rooms = {
         
         // detect arrows
         input.addEventListener('keydown', e => {
-            let command = '';
+            let command = false;
             if (e.key == 'ArrowUp') {
                 command = commandHistory.getPrev();
             }
             else if (e.key == 'ArrowDown') {
                 command = commandHistory.getNext();
             }
-            console.log(commandHistory.list, commandHistory.index)
-            if (command != '') {
+
+            if (command !== false) {
                 input.value = command;
             }
         });
