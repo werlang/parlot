@@ -151,5 +151,34 @@ async function fadeOut(elem, time=300){
     });
 }
 
+const commandHistory = {
+    index: -1,
+    maxLength: 50,
+    list: [],
 
-export { Toast, Modal, fadeIn, fadeOut };
+    getNext: function() {
+        if (this.index == -1) return '';
+        this.index = Math.min(this.index + 1, this.list.length - 1);
+        return this.list[ this.index ];
+    }, 
+
+    getPrev: function() {
+        if (this.index == -1) return '';
+        this.index = Math.max(this.index - 1, 0);
+        return this.list[ this.index ];
+    },
+
+    add: function(command) {
+        // do not add if last command == command
+        if (command != this.list[ this.list.length - 1 ]) {
+            this.list.push(command);
+        }
+        // remove oldest if command list filled
+        if (this.list.length >= this.maxLength) {
+            this.list.shift();
+        }
+        this.index = this.list.length;
+    },
+}
+
+export { Toast, Modal, fadeIn, fadeOut, commandHistory };

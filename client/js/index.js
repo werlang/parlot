@@ -1,4 +1,4 @@
-import { Modal, Toast } from './utils.js';
+import { commandHistory, Modal, Toast } from './utils.js';
 import { socket } from './wsclient.js';
 import './font-awesome.js';
 
@@ -17,9 +17,8 @@ socket.connect().then(skt => {
             rooms.update();
             if (data.id != skt.id) {
                 const action = ({ join: 'joined', leave: 'left' })[ data.type ];
-                const message = `🚪 Client <span class="bold">${ data.name || data.id }</span> ${ action } room <span class="bold">${ data.room }</span>`;
-                new Toast(message, { timeOut: 5000 } );
-                console.log(message);
+                new Toast(`🚪 Client <span class="bold">${ data.name || data.id }</span> ${ action } room <span class="bold">${ data.room }</span>`, { timeOut: 5000 } );
+                console.log(`Client ${ data.name || data.id } ${ action } room ${ data.room }`);
             }
             return;
         }
@@ -203,6 +202,13 @@ const rooms = {
         const input = worker.terminal.dom.querySelector('input');
 
         worker.submit = () => {
+            commandHistory.add(input.value);
+
+            if (input.value == 'clear' || input.value == 'cls') {
+                this.clearTerminal(worker);
+                return;
+            }
+
             socket.emit(worker.id, {
                 action: 'execute',
                 command: input.value,
@@ -239,6 +245,21 @@ const rooms = {
                         wInput.value = '';
                     });
                 }
+            }
+        });
+        
+        // detect arrows
+        input.addEventListener('keydown', e => {
+            let command = '';
+            if (e.key == 'ArrowUp') {
+                command = commandHistory.getPrev();
+            }
+            else if (e.key == 'ArrowDown') {
+                command = commandHistory.getNext();
+            }
+            console.log(commandHistory.list, commandHistory.index)
+            if (command != '') {
+                input.value = command;
             }
         });
 
@@ -285,6 +306,12 @@ const rooms = {
         if (insert) {
             worker.terminal.lines.push(text);
         }
+    },
+
+    clearTerminal: function(worker) {
+        const terminal = worker.terminal.dom.querySelector('.terminal');
+        terminal.innerHTML = '';
+        worker.terminal.lines = [];
     },
 
     getWorker: function(id) {
