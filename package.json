@@ -4,7 +4,6 @@
   "version": "0.1.0",
   "scripts": {
     "start": "node app.js",
-    "release": "release/create_release.sh",
     "worker": "cd worker && node worker.js"
   },
   "repository": {

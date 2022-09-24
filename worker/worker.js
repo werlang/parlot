@@ -1,6 +1,7 @@
 const { spawn } = require('child_process');
 const fs = require('fs');
 const fetch = require('node-fetch');
+const version = require('./version.json').version;
 
 const readline = require('readline').createInterface({
     input: process.stdin,

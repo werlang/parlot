@@ -1,0 +1,28 @@
+{
+    "name": "parlot-worker",
+    "description": "Be a worker machine, execute the commands you are given.",
+    "version": "0.2.0",
+    "scripts": {
+      "start": "node worker.js",
+      "release": "../release/create_release.sh"
+    },
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/werlang/parlot"
+    },
+    "keywords": [],
+    "author": "Pablo Welrlang",
+    "license": "GPL-3.0-only",
+    "homepage": "https://parlot.tk",
+    "pkg": {
+      "assets": "version.json",
+      "targets": [ "node16-linux-x64", "node16-macos-x64", "node16-win-x64" ],
+      "outputPath": "../release"
+    },
+    "bin": "worker.js",
+    "dependencies": {
+      "node-fetch": "^2.6.7",
+      "ws": "^8.8.1"
+    }
+  }
+  
