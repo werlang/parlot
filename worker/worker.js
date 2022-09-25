@@ -1,7 +1,6 @@
 const { spawn } = require('child_process');
 const fs = require('fs');
 const fetch = require('node-fetch');
-const version = require('./version.json').version;
 
 const readline = require('readline').createInterface({
     input: process.stdin,
@@ -19,6 +18,9 @@ process.argv.forEach((val, index, array) => {
     }
     if ((val == '-a' || val == '--auto')){
         args.auto = true;
+    }
+    if ((val == '-v' || val == '--version')){
+        args.printVersion = true;
     }
 });
 
@@ -75,6 +77,24 @@ if (config.get().production === false) {
     config.wsserver.url = 'localhost';
     config.wsserver.port = 4210;
     config.wsserver.serverPort = 4200;
+}
+
+const version = (() => {
+    try {
+        return require('./version.json').version;
+    }
+    catch(err) {
+        return process.env.npm_package_version || false;
+    }
+})();
+if (!version) {
+    console.log(`You should run this with 'npm start'`);
+    return;
+}
+
+if (args.printVersion) {
+    console.log(`v${ version }`);
+    return;
 }
 
 const socket = require('./wsclient.js')( config.wsserver );
@@ -139,8 +159,6 @@ const socket = require('./wsclient.js')( config.wsserver );
 
     readline.close();
 })();
-
-
 
 function executeCommand(data) {
     if (data.action && data.action == 'execute') {
