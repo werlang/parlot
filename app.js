@@ -58,7 +58,8 @@ app.get('/randomname', async (req, res) => {
 });
 
 app.get('/download/:os', async (req, res) => {
-    const filePath = `${__dirname}/release/parlot-worker-${ req.params.os }.zip`;
+    const type = req.query.type || 'zip';
+    const filePath = `${__dirname}/release/parlot-worker-${ req.params.os }.${ type == 'tar' ? 'tar.gz' : 'zip' }`;
     if (fs.existsSync(filePath)) {
         res.download(filePath);
         return;
@@ -66,6 +67,11 @@ app.get('/download/:os', async (req, res) => {
     res.status(404).send({ message: 'This file does not exists.' });
 });
 
+// get the current worker version available
+app.get('/update/version', async (req, res) => {
+    const version = require(`${ __dirname }/worker/package.json`).version;
+    res.send({ version: version });
+});
 
 app.use((_, res) => res.status(404).send({ message: 'Nothing to be seen here.' }));
 

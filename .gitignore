@@ -1,5 +1,6 @@
 .conf
 node_modules
 release/*.zip
+release/*.gz
 config.json
 cwp_stats
