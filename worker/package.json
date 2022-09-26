@@ -26,6 +26,7 @@
     "bin": "worker.js",
     "dependencies": {
         "node-fetch": "^2.6.7",
+        "tar": "^6.1.11",
         "ws": "^8.8.1"
     }
 }

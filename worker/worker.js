@@ -1,6 +1,7 @@
 const { spawn } = require('child_process');
 const fs = require('fs');
 const fetch = require('node-fetch');
+const tar = require('tar');
 
 const readline = require('readline').createInterface({
     input: process.stdin,
@@ -24,6 +25,11 @@ process.argv.forEach((val, index, array) => {
     }
 });
 
+const platform = ({
+    darwin: 'macos',
+    win32: 'windows',
+    linux: 'linux',
+})[ process.platform ] || 'unknown';
 
 const config = {
     path: 'config.json',
@@ -59,10 +65,14 @@ const config = {
         fs.writeFileSync(this.path, JSON.stringify(file));
     },
 
-    createName: async function() {
+    getURL: function() {
         const protocol = this.wsserver.secure ? 'https' : 'http';
         const serverPort = this.wsserver.serverPort ? `:${this.wsserver.serverPort}` : '';
-        const res = await fetch(`${ protocol }://${ this.wsserver.url }${ serverPort }/randomname`);
+        return `${ protocol }://${ this.wsserver.url }${ serverPort }`;
+    },
+
+    createName: async function() {
+        const res = await fetch(`${ this.getURL() }/randomname`);
         const data = await res.json();
         
         const info = this.get();
@@ -89,13 +99,45 @@ const version = (() => {
 })();
 if (!version) {
     console.log(`You should run this with 'npm start'`);
-    return;
+    process.exit(1);
 }
 
 if (args.printVersion) {
     console.log(`v${ version }`);
-    return;
+    process.exit(0);
 }
+
+// check for updates
+(async () => {
+    let req = await fetch(config.getURL() +'/update/version');
+    let data = await req.json();
+    
+    if (version == data.version) {
+        return;
+    }
+
+    console.log(`There is an update to version ${ data.version }. Downloading...`);
+
+    const downloadFile = (async (url, path) => {
+        const res = await fetch(url);
+        const fileStream = fs.createWriteStream(path);
+        await new Promise((resolve, reject) => {
+            res.body.pipe(fileStream);
+            res.body.on("error", reject);
+            fileStream.on("finish", resolve);
+        });
+    });
+    await downloadFile(`${ config.getURL() }/download/${ platform }?type=tar`, 'update.tar.gz');
+
+    console.log('Unzipping...');
+    await tar.x({ file: 'update.tar.gz' });
+
+
+    console.log('Restarting worker...');
+    spawn(`./parlot-worker-${ platform }`, [], { detached: true, cwd: './' });
+
+    process.exit(0);
+})();
 
 const socket = require('./wsclient.js')( config.wsserver );
 
