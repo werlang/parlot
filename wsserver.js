@@ -2,20 +2,31 @@ const WebSocket  = require('ws');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 
+// - subdomain ws.parlot.tk
+// - nginx proxy domain: port 4200
+// - proxy subdomain: port 4210
 
 // for nginx proxy your websocket service, replace location / on vhosts conf file with this:
+
 // location / {
-//     proxy_set_header HOST $host;
-//     proxy_set_header X- Real - IP $remote_addr;
-//     proxy_set_header X - Forwarded - For $proxy_add_x_forwarded_for;
-//     proxy_set_header X - Forwarded - Proto $scheme;
-//     proxy_pass_request_headers on;
-//     proxy_pass http://YOUR_SERVER_IP:WEBSOCKET_PORT;
-//     proxy_http_version 1.0;
+//     proxy_set_header        Host $host;
+//     proxy_set_header        X-Real-IP $remote_addr;
+//     proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+//     proxy_set_header        X-Forwarded-Proto $scheme;
+
+//     # Fix the “It appears that your reverse proxy set up is broken" error.
+//     proxy_pass          http://localhost:4210;
+//     proxy_read_timeout  90;
+
+//     # WebSocket support
+//     proxy_http_version 1.1;
 //     proxy_set_header Upgrade $http_upgrade;
-//     proxy_set_header Connection "Upgrade";
+//     proxy_set_header Connection "upgrade";
 // }
 
+// paste this as it is. change only the PORT part.
+// if ssl conf file, this line instead:
+// proxy_pass          https://localhost:4210;
 
 module.exports = app => {
     const config = JSON.parse(fs.readFileSync('config.json'));
